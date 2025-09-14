@@ -25,6 +25,8 @@ public class Stock implements Serializable {
     private  String id;
 
     private String name;
+    private String phone;
+    private String email;
 
     @OneToOne
     @JoinColumn(name = "address_id")

@@ -18,7 +18,7 @@ public class XStoreApplication {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("xstore");
         GenericDAO<Product> dao = new GenericDAOImpl<>(Product.class);
         Product p = (Product) dao.findByID("1");
-            System.out.println(p.toString());
+        System.out.println(p.toString());
         emf.close();
     }
 }

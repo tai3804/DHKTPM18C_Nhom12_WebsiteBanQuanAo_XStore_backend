@@ -22,6 +22,7 @@
         <class>xstore.model.Role</class>
         <class>xstore.model.Unit</class>
         <class>xstore.model.Stock</class>
+        <class>xstore.model.DetailStock</class>
         <class>xstore.model.Role</class>
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/xstore"/>

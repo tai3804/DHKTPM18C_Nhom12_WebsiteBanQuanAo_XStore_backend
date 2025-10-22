@@ -1,9 +1,10 @@
 package iuh.fit.xstore.controller;
 
+import iuh.fit.xstore.dto.response.ApiResponse;
+import iuh.fit.xstore.dto.response.SuccessCode;
 import iuh.fit.xstore.model.User;
 import iuh.fit.xstore.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,27 +13,35 @@ import java.util.List;
 @RequestMapping("/users")
 @AllArgsConstructor
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping
-    List<User> getUsers () {
-        return userService.findAll();
+    ApiResponse<List<User>> getUsers () {
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS,userService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<User> getUser(@PathVariable int id) {
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.findById(id));
     }
 
     @PostMapping()
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    ApiResponse<User> createUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return new ApiResponse<>(SuccessCode.USER_CREATED, createdUser);
     }
 
-
-    @PutMapping("/update")
-    public User updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    @PutMapping("/{id}")
+    ApiResponse<User> updateUser(@PathVariable int id, @RequestBody User user) {
+        user.setId(id);
+        User updatedUser = userService.updateUser(user);
+        return new ApiResponse<>(SuccessCode.USER_UPDATED, updatedUser);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Integer> deleteUser(@PathVariable int id) {
-        return ResponseEntity.ok(userService.deleteUser(id));
+    ApiResponse<Integer> deleteUser(@PathVariable int id) {
+        userService.deleteUser(id);
+        return new ApiResponse<>(SuccessCode.USER_DELETED, id);
     }
 }

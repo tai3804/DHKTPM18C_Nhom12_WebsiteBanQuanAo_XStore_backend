@@ -19,4 +19,10 @@ public class ApiResponse<T> {
         this.message = errorCode.getMessage();
         this.result = null;
     }
+
+    public ApiResponse(SuccessCode successCode, T result) {
+        this.code = successCode.getCode();
+        this.message = successCode.getMessage();
+        this.result = result;
+    }
 }

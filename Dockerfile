@@ -12,8 +12,6 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
-# Copy file .jar từ stage build sang
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/*.war app.war
+ENTRYPOINT ["java", "-jar", "app.war"]
 
-# Chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "app.jar"]

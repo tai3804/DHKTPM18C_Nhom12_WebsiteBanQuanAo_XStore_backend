@@ -1,5 +1,5 @@
 # ---- STAGE 1: Build ----
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3-openjdk-17 AS build
 WORKDIR /app
 
 # Copy toàn bộ source code
@@ -9,9 +9,10 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # ---- STAGE 2: Run ----
-FROM eclipse-temurin:17-jdk-alpine
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-COPY --from=build /app/target/*.war app.war
+COPY --from=build /app/target/X-Store-0.0.1-SNAPSHOT.war app.war
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.war"]
 

@@ -6,6 +6,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum SuccessCode {
+    LOGIN_SUCCESSFULLY(200, "Login successfully"),
+    REGISTER_SUCCESSFULLY(200, "Register successfully"),
+    RESET_PASSWORD_SUCCESSFULLY(200, "Reset password successfully"),
+
     USER_CREATED(201, "User created successfully"),
     USER_UPDATED(200, "User updated successfully"),
     USER_DELETED(200, "User deleted successfully"),

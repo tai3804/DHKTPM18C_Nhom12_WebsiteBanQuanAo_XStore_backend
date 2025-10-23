@@ -6,22 +6,29 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
+//    === USER ===
     USER_NOT_FOUND(404, "User not found"),
     USER_EXISTED(409, "User already exists"),
 
+//    === ACCOUNT ===
     ACCOUNT_NOT_FOUND(404, "Account not found"),
     ACCOUNT_EXISTED(409, "Account already exists"),
+    USERNAME_NOT_FOUND(404, "Username not found"),
     USERNAME_EXISTED(409, "Username already exists"),
     PASSWORD_EMPTY(400, "Password cannot be empty"),
     INVALID_PASSWORD(401, "Invalid password"),
+    INCORRECT_USERNAME_OR_PASSWORD(401, "Incorrect username or password"),
 
+//    === PRODUCT ===
     PRODUCT_NOT_FOUND(404, "Product not found"),
     PRODUCT_EXISTED(409, "Product already exists"),
     PRODUCT_TYPE_NOT_FOUND(404, "Product type not found"),
     PRODUCT_TYPE_EXISTED(409, "Product type already exists"),
 
+//    === ADDRESS ===
     ADDRESS_NOT_FOUND(404, "Address not found"),
 
+//    === FAVOURITE ===
     FAVOURITE_EXISTED(409, "Favorite already exists"),
     FAVOURITE_NOT_FOUND(404, "Favorite not found"),
 

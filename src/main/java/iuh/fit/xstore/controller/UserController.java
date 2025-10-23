@@ -25,6 +25,12 @@ public class UserController {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.findById(id));
     }
 
+    // GET USER BY USERNAME
+    @GetMapping("/username/{username}")
+    public ApiResponse<User> getUserByUsername(@PathVariable String username) {
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.findByUsername(username));
+    }
+
     @PostMapping()
     ApiResponse<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);

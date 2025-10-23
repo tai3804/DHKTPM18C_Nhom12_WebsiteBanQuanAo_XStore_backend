@@ -18,13 +18,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()); // tắt CSRF
-//                .authorizeHttpRequests(auth -> auth
-                        // cho phép tất cả người dùng vào các link sau mà k cần login
-//                        .requestMatchers().permitAll()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN") // yêu cầu quyền admin
-//                        .anyRequest().authenticated() // yêu cầu login cho các đường dẫn còn lại
-//                );
+                .csrf(csrf -> csrf.disable()) // tắt CSRF
+                .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(PERMIT).permitAll() // Cho phép truy cập mà không cần login
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .anyRequest().authenticated()
+                        );
+
         return http.build();
     }
 

@@ -1,6 +1,7 @@
 package iuh.fit.xstore.security;
 
 import iuh.fit.xstore.model.Account;
+import iuh.fit.xstore.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,10 @@ public class UserDetail implements UserDetails {
     @Override
     public String getPassword() {
         return account.getPassword();
+    }
+
+    public Role getRole() {
+        return account.getRole();
     }
 
     @Override

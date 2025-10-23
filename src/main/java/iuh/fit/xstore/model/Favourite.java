@@ -3,8 +3,7 @@ package iuh.fit.xstore.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-import java.util.Objects;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,16 +30,4 @@ public class Favourite {
     private Product product;
 }
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Builder
 
-@Embeddable
-class FavouriteID implements Serializable {
-    private int userId;
-    private int productId;
-}

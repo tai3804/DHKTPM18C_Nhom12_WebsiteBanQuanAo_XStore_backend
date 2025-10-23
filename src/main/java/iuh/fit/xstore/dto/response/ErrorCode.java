@@ -15,7 +15,36 @@ public enum ErrorCode {
     PASSWORD_EMPTY(400, "Password cannot be empty"),
     INVALID_PASSWORD(401, "Invalid password"),
 
+    PRODUCT_NOT_FOUND(404, "Product not found"),
+    PRODUCT_EXISTED(409, "Product already exists"),
+    PRODUCT_TYPE_NOT_FOUND(404, "Product type not found"),
+    PRODUCT_TYPE_EXISTED(409, "Product type already exists"),
+
+    ADDRESS_NOT_FOUND(404, "Address not found"),
+
+    FAVOURITE_EXISTED(409, "Favorite already exists"),
+    FAVOURITE_NOT_FOUND(404, "Favorite not found"),
+
+    // ===== ORDER =====
+    ORDER_NOT_FOUND(404, "Order not found"),
+    ORDER_EXISTED(409, "Order already exists"),
+    INVALID_QUANTITY(409, "Invalid quantity"),
+
+    // ===== ORDER ITEM =====
+    ORDER_ITEM_NOT_FOUND(404, "Order item not found"),
+    ORDER_ITEM_EXISTED(409, "Order item already exists"),
     TOKEN_EXPIRED(403, "Token has expired"),
+
+    // === Discount Errors ===
+    DISCOUNT_NOT_FOUND(404, "Discount not found"),
+    DISCOUNT_EXISTED(409, "Discount already exists"),
+
+//    === Stock ===
+    STOCK_NOT_FOUND(404, "Stock not found"),
+    STOCK_ITEM_NOT_FOUND(404, "Stock item not found"),
+    NOT_ENOUGH_QUANTITY(409, "Not enough quantity"),
+    STOCK_DELETE_FAILED(409, "Cannot delete stock while items remain"),
+
     UNKNOWN_ERROR(500, "Something went wrong");
 
     private final int code;

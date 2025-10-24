@@ -32,11 +32,14 @@ public class User {
     private String phone;
     private String avatar;
 
-    private int point; // diem de xet loai user
+    @Builder.Default
+    private int point = 0; // diem de xet loai user
 
     @Column(name = "user_type")
     @Enumerated(EnumType.STRING)
-    private UserType userType; // loai user (tich diem) dong - bac - vang
+
+    @Builder.Default
+    private UserType userType = UserType.COPPER; // loai user (tich diem) dong - bac - vang
 
     @OneToOne
     @JoinColumn(name = "address_id")

@@ -11,7 +11,7 @@ import iuh.fit.xstore.model.Role;
 import iuh.fit.xstore.model.User;
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.security.UserDetail;
-import iuh.fit.xstore.util.jwtUtil;
+import iuh.fit.xstore.util.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -48,9 +51,17 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetail userDetail = (UserDetail) authentication.getPrincipal();
-            String token = jwtUtil.generateToken(userDetail);
+            String token = JwtUtil.generateToken(userDetail);
 
-            return new ApiResponse<>(SuccessCode.LOGIN_SUCCESSFULLY, token);
+
+            User user = userRepository.getByAccountUsername(request.getUsername());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("token", token);
+            data.put("user", user);
+
+            return new ApiResponse<>(SuccessCode.LOGIN_SUCCESSFULLY, data);
+
         } catch (BadCredentialsException e) {
             return new ApiResponse<>(ErrorCode.INCORRECT_USERNAME_OR_PASSWORD);
         } catch (Exception e) {

@@ -35,6 +35,7 @@ public class User {
     private int point; // diem de xet loai user
 
     @Column(name = "user_type")
+    @Enumerated(EnumType.STRING)
     private UserType userType; // loai user (tich diem) dong - bac - vang
 
     @OneToOne

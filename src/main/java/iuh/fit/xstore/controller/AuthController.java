@@ -7,18 +7,22 @@ import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.dto.response.SuccessCode;
 import iuh.fit.xstore.model.Account;
+import iuh.fit.xstore.model.Cart;
 import iuh.fit.xstore.model.Role;
 import iuh.fit.xstore.model.User;
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.security.UserDetail;
+import iuh.fit.xstore.service.OtpMailService;
+import iuh.fit.xstore.service.OtpStorageService;
 import iuh.fit.xstore.util.JwtUtil;
+import iuh.fit.xstore.util.OtpUtil;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,13 +34,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class AuthController {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
@@ -62,10 +61,14 @@ public class AuthController {
 
             return new ApiResponse<>(SuccessCode.LOGIN_SUCCESSFULLY, data);
 
+        } catch (UsernameNotFoundException  e) {
+            return new ApiResponse<>(ErrorCode.USER_NOT_FOUND);
         } catch (BadCredentialsException e) {
             return new ApiResponse<>(ErrorCode.INCORRECT_USERNAME_OR_PASSWORD);
         } catch (Exception e) {
-            return new ApiResponse<>(ErrorCode.USER_NOT_FOUND);
+            // Các lỗi không mong đợi
+            e.printStackTrace();
+            return new ApiResponse<>(ErrorCode.UNKNOWN_ERROR);
         }
     }
 
@@ -84,7 +87,12 @@ public class AuthController {
                         .username(request.getUsername())
                         .password(passwordEncoder.encode(request.getPassword()))
                         .role(Role.CUSTOMER)
-                        .build())
+                        .build()
+                )
+                .cart(Cart.builder()
+                        .total(0)
+                        .build()
+                )
                 .build();
         userRepository.save(user);
 

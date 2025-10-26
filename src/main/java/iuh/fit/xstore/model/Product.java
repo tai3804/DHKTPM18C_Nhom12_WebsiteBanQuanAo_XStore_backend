@@ -34,6 +34,8 @@ public class Product {
     @JoinColumn(name="product_type_id")
     private ProductType type;
     private String brand;
+
+    @Enumerated(EnumType.STRING)
     private Size size;
     private String color;
     private String fabric;

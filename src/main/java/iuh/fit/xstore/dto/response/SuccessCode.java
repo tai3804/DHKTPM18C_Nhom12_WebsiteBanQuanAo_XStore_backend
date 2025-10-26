@@ -10,6 +10,9 @@ public enum SuccessCode {
     REGISTER_SUCCESSFULLY(200, "Register successfully"),
     RESET_PASSWORD_SUCCESSFULLY(200, "Reset password successfully"),
 
+    OTP_SEND_SUCCESSFULLY(200, "Send otp successfully"),
+    OTP_VALID(200, "Valid Otp"),
+
     USER_CREATED(201, "User created successfully"),
     USER_UPDATED(200, "User updated successfully"),
     USER_DELETED(200, "User deleted successfully"),

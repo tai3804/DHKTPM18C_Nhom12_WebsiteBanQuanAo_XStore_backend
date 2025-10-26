@@ -42,7 +42,7 @@ public class ProductService {
     }
     
     public Product createProduct(Product product) {
-        if (productRepository.existsByName(product.getName())) {
+        if (productRepository.existsById(product.getId())) {
             throw new AppException(ErrorCode.PRODUCT_EXISTED);
         }
         return productRepository.save(product);

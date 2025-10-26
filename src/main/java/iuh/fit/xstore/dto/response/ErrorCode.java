@@ -9,6 +9,8 @@ public enum ErrorCode {
 //    === USER ===
     USER_NOT_FOUND(404, "User not found"),
     USER_EXISTED(409, "User already exists"),
+//    OTP
+    OTP_INVALID_OR_EXPIRATION(409, "Invalid OTP or had been expiration"),
 
 //    === ACCOUNT ===
     ACCOUNT_NOT_FOUND(404, "Account not found"),
@@ -18,6 +20,8 @@ public enum ErrorCode {
     PASSWORD_EMPTY(400, "Password cannot be empty"),
     INVALID_PASSWORD(401, "Invalid password"),
     INCORRECT_USERNAME_OR_PASSWORD(401, "Incorrect username or password"),
+    ACCOUNT_DISABLED(403, "Your account has been disabled"),  // Sửa tên + thêm code + message
+    ACCOUNT_LOCKED(403, "Your account is locked"),
 
 //    === PRODUCT ===
     PRODUCT_NOT_FOUND(404, "Product not found"),

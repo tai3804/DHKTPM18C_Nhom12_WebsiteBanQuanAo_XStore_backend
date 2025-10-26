@@ -34,7 +34,7 @@ public class ProductTypeController {
     @PutMapping("/{id}")
     public ApiResponse<ProductType> updateProductType(@PathVariable int id, @RequestBody ProductType productType) {
         productType.setId(id);
-        ProductType updatedProductType = productTypeService.updateProductType(productType);
+        ProductType updatedProductType = productTypeService.updateProductType(id, productType);
         return new ApiResponse<>(SuccessCode.PRODUCT_TYPE_UPDATED, updatedProductType);
     }
 

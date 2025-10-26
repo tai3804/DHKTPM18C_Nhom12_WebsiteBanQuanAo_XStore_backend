@@ -35,8 +35,8 @@ public class ProductTypeService {
         return productTypeRepository.save(productType);
     }
     
-    public ProductType updateProductType(ProductType productType) {
-        ProductType existingType = productTypeRepository.findById(productType.getId())
+    public ProductType updateProductType(int id, ProductType productType) {
+        ProductType existingType = productTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
         
         existingType.setName(productType.getName());

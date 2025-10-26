@@ -2,9 +2,8 @@ package iuh.fit.xstore.service;
 
 import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
-import iuh.fit.xstore.model.Cart;
-import iuh.fit.xstore.model.User;
-import iuh.fit.xstore.model.UserType;
+import iuh.fit.xstore.model.*;
+import iuh.fit.xstore.repository.AccountRepository;
 import iuh.fit.xstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepo;
+    private final AccountRepository accountRepo;
     private final PasswordEncoder passwordEncoder;
 
     public List<User> findAll() {
@@ -35,29 +35,45 @@ public class UserService {
     }
 
     //tao user
+
     public User createUser(User user) {
+        // --- Kiểm tra tài khoản đã tồn tại ---
         if (userRepo.existsByAccountUsername(user.getAccount().getUsername())) {
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
-        if (user.getAccount() != null) {
-            user.getAccount().setPassword(
-                    passwordEncoder.encode(user.getAccount().getPassword())
-            );
-        }
 
-        Cart cart = Cart.builder().total(0).build();
-        user.setCart(cart);
+        // --- Tạo mới Account ---
+        Account account = user.getAccount();
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        account.setRole(Role.CUSTOMER); // hoặc set theo logic riêng
+        account = accountRepo.save(account); // ⚡ Lưu riêng để tránh lỗi detached
 
-        user.setUserType(UserType.COPPER);
-        user.setPoint(0);
+        // --- Tạo giỏ hàng mặc định ---
+        Cart cart = Cart.builder()
+                .total(0)
+                .build();
 
-        return userRepo.save(user);
+        // --- Tạo mới User ---
+        User newUser = User.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .dob(user.getDob())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .userType(UserType.COPPER)
+                .point(0)
+                .account(account)
+                .cart(cart)
+                .build();
+
+        return userRepo.save(newUser);
     }
 
 
+
     // Cập nhật user
-    public User updateUser(User user) {
-        User existedUser = userRepo.findById(user.getId())
+    public User updateUser(int id, User user) {
+        User existedUser = userRepo.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         existedUser.setFirstName(user.getFirstName());

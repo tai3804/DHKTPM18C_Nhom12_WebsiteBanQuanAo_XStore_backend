@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] PUBLIC = {"/", "/auth/**", "/product/**"};
+    private static final String[] PUBLIC = {"/", "/auth/**", "/otp/**", "/products/**", "/product-types/**"};
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;

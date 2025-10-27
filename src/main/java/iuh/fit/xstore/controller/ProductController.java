@@ -48,4 +48,10 @@ public class ProductController {
         productService.deleteProduct(id);
         return new ApiResponse<>(SuccessCode.PRODUCT_DELETED, id);
     }
+
+    @GetMapping("/search")
+    public ApiResponse<List<Product>> searchProducts(@RequestParam(value = "q", required = false) String keyword) {
+        List<Product> products = productService.searchProducts(keyword);
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, products);
+    }
 }

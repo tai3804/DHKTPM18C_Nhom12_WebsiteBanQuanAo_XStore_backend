@@ -10,6 +10,8 @@ package iuh.fit.xstore.repository;
 import iuh.fit.xstore.model.Product;
 import iuh.fit.xstore.model.ProductType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,4 +24,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByBrand(String brand);
     Optional<Product> findByName(String name);
     boolean existsByName(String name);
+
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Product> searchByName(@Param("keyword") String keyword);
 }

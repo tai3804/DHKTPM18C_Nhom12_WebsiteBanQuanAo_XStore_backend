@@ -71,4 +71,11 @@ public class ProductService {
         productRepository.deleteById(id);
         return id;
     }
+
+    public List<Product> searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return productRepository.findAll();
+        }
+        return productRepository.searchByName(keyword.trim());
+    }
 }

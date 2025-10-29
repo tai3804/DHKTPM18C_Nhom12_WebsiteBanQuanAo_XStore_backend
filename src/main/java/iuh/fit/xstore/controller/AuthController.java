@@ -17,6 +17,7 @@ import iuh.fit.xstore.service.OtpStorageService;
 import iuh.fit.xstore.util.JwtUtil;
 import iuh.fit.xstore.util.OtpUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
@@ -37,6 +39,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ApiResponse<?> login(@RequestBody LoginRequest request) {
@@ -50,10 +53,14 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetail userDetail = (UserDetail) authentication.getPrincipal();
-            String token = JwtUtil.generateToken(userDetail);
+            String token = jwtUtil.generateToken(userDetail);
 
 
             User user = userRepository.getByAccountUsername(request.getUsername());
+
+            var username = SecurityContextHolder.getContext().getAuthentication();
+
+                log.warn("return: ", username);
 
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);

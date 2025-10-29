@@ -51,7 +51,6 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("https://nhom12-website-ban-quan-ao-x-store-six.vercel.app", "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

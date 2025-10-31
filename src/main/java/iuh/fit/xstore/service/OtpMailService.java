@@ -13,7 +13,7 @@ public class OtpMailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendOtpEmail(String to, String otp) throws MessagingException {
+    public void sendOtpEmail(String to, String keyword, String otp) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -21,10 +21,12 @@ public class OtpMailService {
         helper.setSubject("Mã OTP của bạn");
 
         String htmlContent = "<div style='font-family: Arial, sans-serif;'>" +
-                "<h2>Mã OTP của bạn</h2>" +
-                "<p>Đây là mã OTP dùng một lần để xác thực:</p>" +
+                "<h2>OTP dùng để "+ keyword+"</h2>" +
+                "<p>Đây là mã OTP dùng một lần được gửi từ website bán hàng <h3>XStore</h3> dùng để xác thực "+keyword+"</p>" +
+                "<br>Mã OTP của bạn là: " +
                 "<h3 style='color: blue;'>" + otp + "</h3>" +
                 "<p>Mã có hiệu lực trong 5 phút.</p>" +
+                "<span style='color: red;'> Vui lòng không cung cấp OTP cho bất kì ai kể cả nhân viên shop</span>" +
                 "</div>";
 
         helper.setText(htmlContent, true);

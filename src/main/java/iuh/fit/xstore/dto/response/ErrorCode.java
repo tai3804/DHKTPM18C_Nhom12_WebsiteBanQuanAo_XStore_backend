@@ -56,6 +56,10 @@ public enum ErrorCode {
     NOT_ENOUGH_QUANTITY(409, "Not enough quantity"),
     STOCK_DELETE_FAILED(409, "Cannot delete stock while items remain"),
 
+//    ===file===
+    FILE_EMPTY(400, "File is empty"),
+    FILE_UPLOAD_FAILED(400, "Could not upload file"),
+
     UNKNOWN_ERROR(500, "Something went wrong");
 
     private final int code;

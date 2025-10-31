@@ -61,6 +61,9 @@ public enum SuccessCode {
     STOCK_ITEM_UPDATED(200, "Stock Item updated successfully"),
     STOCK_ITEM_DELETED(200, "Stock Item deleted successfully"),
 
+//    ===file===
+    FILE_UPLAOD_SUCCESSFULLY(200, "Upload file successfully"),
+
     FETCH_SUCCESS(200, "Data fetched successfully");
 
     private final int code;

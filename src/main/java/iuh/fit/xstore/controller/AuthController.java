@@ -12,10 +12,8 @@ import iuh.fit.xstore.model.Role;
 import iuh.fit.xstore.model.User;
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.security.UserDetail;
-import iuh.fit.xstore.service.OtpMailService;
-import iuh.fit.xstore.service.OtpStorageService;
-import iuh.fit.xstore.util.JwtUtil;
-import iuh.fit.xstore.util.OtpUtil;
+import iuh.fit.xstore.service.JwtService;
+import iuh.fit.xstore.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,7 +37,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    private JwtUtil jwtUtil;
+    private JwtService jwtUtil;
 
     @PostMapping("/login")
     public ApiResponse<?> login(@RequestBody LoginRequest request) {

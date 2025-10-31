@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -55,5 +56,18 @@ public class MailService {
         helper.addAttachment(attachment.getName(), attachment);
 
         mailSender.send(message);
+    }
+
+    public static class OtpService {
+
+        private static final SecureRandom random = new SecureRandom();
+
+        public static String generateOtp(int length) {
+            StringBuilder otp = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                otp.append(random.nextInt(10)); // 0-9
+            }
+            return otp.toString();
+        }
     }
 }

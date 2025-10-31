@@ -68,6 +68,8 @@ public enum SuccessCode {
     CART_CREATED(201, "Cart created successfully"),
     CART_UPDATED(200, "Cart updated successfully"),
     CART_DELETED(200, "Cart deleted successfully"),
+//    ===file===
+    FILE_UPLAOD_SUCCESSFULLY(200, "Upload file successfully"),
 
     FETCH_SUCCESS(200, "Data fetched successfully");
 

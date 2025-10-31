@@ -1,4 +1,5 @@
-package iuh.fit.xstore.util;
+package iuh.fit.xstore.service;
+
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -12,7 +13,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
-public class JwtUtil {
+public class JwtService {
     @Value("${jwt.key}")
     private String key;
 

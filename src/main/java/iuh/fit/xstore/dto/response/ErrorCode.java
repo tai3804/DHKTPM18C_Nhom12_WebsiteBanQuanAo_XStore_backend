@@ -60,6 +60,9 @@ public enum ErrorCode {
     CART_ITEM_NOT_FOUND(404, "Cart item not found"),
     CART_ITEM_EXISTED(409, "Cart item already exists"),
 
+//    ===file===
+    FILE_EMPTY(400, "File is empty"),
+    FILE_UPLOAD_FAILED(400, "Could not upload file"),
 
     UNKNOWN_ERROR(500, "Something went wrong");
 

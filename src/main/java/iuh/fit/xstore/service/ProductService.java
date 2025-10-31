@@ -1,13 +1,21 @@
 package iuh.fit.xstore.service;
 
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
 import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.Product;
 import iuh.fit.xstore.model.ProductType;
 import iuh.fit.xstore.repository.ProductRepository;
+import iuh.fit.xstore.security.UserDetail;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service

@@ -56,6 +56,10 @@ public enum ErrorCode {
     NOT_ENOUGH_QUANTITY(409, "Not enough quantity"),
     STOCK_DELETE_FAILED(409, "Cannot delete stock while items remain"),
 
+    //cart
+    CART_ITEM_NOT_FOUND(404, "Cart item not found"),
+    CART_ITEM_EXISTED(409, "Cart item already exists"),
+
 //    ===file===
     FILE_EMPTY(400, "File is empty"),
     FILE_UPLOAD_FAILED(400, "Could not upload file"),

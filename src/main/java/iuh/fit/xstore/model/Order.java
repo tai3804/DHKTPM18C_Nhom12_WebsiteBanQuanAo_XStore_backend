@@ -1,5 +1,6 @@
 package iuh.fit.xstore.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,7 @@ public class Order {
     private List<OrderItem> orderItems;
 
     @OneToMany(mappedBy = "order")
+    @JsonManagedReference
     private List<Discount> discounts;
 
     private double total;

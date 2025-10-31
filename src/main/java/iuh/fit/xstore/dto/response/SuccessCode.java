@@ -61,6 +61,14 @@ public enum SuccessCode {
     STOCK_ITEM_UPDATED(200, "Stock Item updated successfully"),
     STOCK_ITEM_DELETED(200, "Stock Item deleted successfully"),
 
+    // cart
+    CART_ITEM_CREATED(201, "Cart item created successfully"),
+    CART_ITEM_UPDATED(200, "Cart item updated successfully"),
+    CART_ITEM_DELETED(200, "Cart item deleted successfully"),
+    CART_CREATED(201, "Cart created successfully"),
+    CART_UPDATED(200, "Cart updated successfully"),
+    CART_DELETED(200, "Cart deleted successfully"),
+
     FETCH_SUCCESS(200, "Data fetched successfully");
 
     private final int code;

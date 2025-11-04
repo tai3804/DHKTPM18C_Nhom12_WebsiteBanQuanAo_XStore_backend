@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/discounts")
+@RequestMapping("/api/discounts")
 @AllArgsConstructor
 public class DiscountController {
 

@@ -1,5 +1,6 @@
 package iuh.fit.xstore.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"colors", "sizes", "orderItems"})
 @EqualsAndHashCode
 @Builder
 
@@ -27,24 +28,33 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
     private String description;
     private String image;
 
     @ManyToOne
-    @JoinColumn(name="product_type_id")
+    @JoinColumn(name = "product_type_id")
     private ProductType type;
-    private String brand;
 
-    @Enumerated(EnumType.STRING)
-    private Size size;
-    private String color;
+    private String brand;
     private String fabric;
 
     @Column(name = "price_in_stock")
     private double priceInStock;
     private double price;
 
+    // ✅ Một product có nhiều màu
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // Điều khiển serialization hướng từ Product -> Color
+    private List<ProductColor> colors = new ArrayList<>();
+
+    // ✅ Một product có nhiều size
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // Điều khiển serialization hướng từ Product -> Size
+    private List<ProductSize> sizes = new ArrayList<>();
+
+    // ✅ OrderItem tham chiếu ngược về Product — không cần JSON
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<OrderItem> orderItems = new ArrayList<>();

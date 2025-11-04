@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class UploadController {
     private final String UPLOAD_DIR = "uploads";
 

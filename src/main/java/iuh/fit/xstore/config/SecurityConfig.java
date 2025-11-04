@@ -23,7 +23,16 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    private static final String[] PUBLIC = {"/", "/auth/**", "/otp/**", "/products/**", "/product-types/**"};
+    private static final String[] PUBLIC = {
+        "/", 
+        "/api/auth/**", 
+        "/api/otp/**", 
+        "/api/products/**", 
+        "/api/product-types/**",
+        "/api/file/**",
+        "/api/carts/**",
+        "/api/cart-items/**"
+    };
 
     @Value("${jwt.key}")
     private String key;
@@ -32,13 +41,17 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
+        
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
-        http.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())));
+        
+        // Tắt OAuth2 ResourceServer để test OTP
+         http.oauth2ResourceServer(oauth2 -> {
+             oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()));
+         });
+        
         http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();

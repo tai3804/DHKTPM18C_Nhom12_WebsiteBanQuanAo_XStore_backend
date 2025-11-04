@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stocks")
+@RequestMapping("/api/stocks")
 @AllArgsConstructor
 public class StockController {
 

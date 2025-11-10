@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product-types")
+@RequestMapping("/api/product-types")
 @AllArgsConstructor
 public class ProductTypeController {
     private final ProductTypeService productTypeService;

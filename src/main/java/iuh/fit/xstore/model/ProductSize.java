@@ -4,36 +4,27 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Copyright (c) 2025 by Tai.
- * All rights reserved.
- * This file is part of X-Store.
- */
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "product")
 @EqualsAndHashCode
 @Builder
 
 @Entity
-@Table(name="order_items")
-public class OrderItem {
+@Table(name = "product_sizes")
+public class ProductSize {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    @JsonBackReference
-    private Order order;
-
-    @ManyToOne
+    // ✅ Ngăn vòng lặp khi serialize sang JSON
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @JsonBackReference
     private Product product;
 
-    private int quantity;
-    private double subTotal;
+    private String name;        // VD: "S", "M", "L"
+    private String description; // VD: "Small - 48-52kg"
 }

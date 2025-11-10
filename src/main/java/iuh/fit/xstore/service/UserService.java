@@ -45,8 +45,10 @@ public class UserService {
         // --- Tạo mới Account ---
         Account account = user.getAccount();
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        account.setRole(Role.CUSTOMER); // hoặc set theo logic riêng
-        account = accountRepo.save(account); // ⚡ Lưu riêng để tránh lỗi detached
+        if (account.getRole().equals(Role.ADMIN)) {
+            account.setRole(Role.ADMIN);
+        }else account.setRole(Role.CUSTOMER);
+        account = accountRepo.save(account);
 
         // --- Tạo giỏ hàng mặc định ---
         Cart cart = Cart.builder()

@@ -5,11 +5,13 @@ import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.*;
 import iuh.fit.xstore.repository.AccountRepository;
 import iuh.fit.xstore.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@Slf4j
 @Configuration
 public class DataInitializer {
 
@@ -40,6 +42,8 @@ public class DataInitializer {
                     .build();
 
             userRepo.save(user);
+
+            log.info("Default admin user has been created username: admin, password: admin, please change password!");
         };
     }
 }

@@ -1,5 +1,6 @@
 package iuh.fit.xstore.controller;
 
+import iuh.fit.xstore.dto.request.ChangePasswordRequest;
 import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.SuccessCode;
 import iuh.fit.xstore.model.User;
@@ -50,5 +51,13 @@ public class UserController {
     ApiResponse<Integer> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return new ApiResponse<>(SuccessCode.USER_DELETED, id);
+    }
+    // === ENDPOINT MỚI ĐỂ ĐỔI MẬT KHẨU ===
+    @PostMapping("/change-password")
+    public ApiResponse<String> changePassword(@RequestBody ChangePasswordRequest request) {
+        userService.changePassword(request);
+
+        // Dùng lại SuccessCode RESET_PASSWORD_SUCCESSFULLY
+        return new ApiResponse<>(SuccessCode.RESET_PASSWORD_SUCCESSFULLY, "Đổi mật khẩu thành công");
     }
 }

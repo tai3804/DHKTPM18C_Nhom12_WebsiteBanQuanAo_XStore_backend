@@ -31,6 +31,6 @@ public class Discount {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @JsonBackReference
+    @JsonBackReference("order-discounts")
     private Order order;
 }

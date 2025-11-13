@@ -1,7 +1,5 @@
 package iuh.fit.xstore.config;
 
-import iuh.fit.xstore.dto.response.AppException;
-import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.*;
 import iuh.fit.xstore.repository.AccountRepository;
 import iuh.fit.xstore.repository.UserRepository;
@@ -20,30 +18,52 @@ public class DataInitializer {
                                UserRepository userRepo,
                                PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepo.existsByAccountUsername("admin")) {
-                return;
+
+            // --- Tạo admin nếu chưa tồn tại ---
+            if (!userRepo.existsByAccountUsername("admin")) {
+                User adminUser = User.builder()
+                        .firstName("admin")
+                        .lastName("default")
+                        .account(
+                                Account.builder()
+                                        .username("admin")
+                                        .password(passwordEncoder.encode("admin"))
+                                        .role(Role.ADMIN)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
+
+                userRepo.save(adminUser);
+                log.info("Default admin user created: username=admin, password=admin");
             }
 
-            User user = User.builder()
-                    .firstName("admin")
-                    .lastName("default")
-                    .account(
-                            Account.builder()
-                                    .username("admin")
-                                    .password(passwordEncoder.encode("admin"))
-                                    .role(Role.ADMIN)
-                            .build()
-                    )
-                    .cart(
-                            Cart.builder()
-                                    .total(0)
-                                    .build()
-                    )
-                    .build();
+            // --- Tạo customer 'hien' nếu chưa tồn tại ---
+            if (!userRepo.existsByAccountUsername("hien")) {
+                User customerUser = User.builder()
+                        .firstName("Hien")
+                        .lastName("Nguyen")
+                        .account(
+                                Account.builder()
+                                        .username("hien")
+                                        .password(passwordEncoder.encode("hienhien"))
+                                        .role(Role.CUSTOMER)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
 
-            userRepo.save(user);
-
-            log.info("Default admin user has been created username: admin, password: admin, please change password!");
+                userRepo.save(customerUser);
+                log.info("Default customer user created: username=hien, password=hienhien");
+            }
         };
     }
 }

@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddToCartRequest {
-    private Integer cartId;    // ✅ Đổi từ Long sang Integer
-    private Integer productId; // ✅ Đổi từ Long sang Integer
+    private Integer cartId;
+    private Integer productId;
+    private Integer stockId;
     private Integer quantity = 1;
 }

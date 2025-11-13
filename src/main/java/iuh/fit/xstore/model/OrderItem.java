@@ -27,12 +27,16 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @JsonBackReference
+    @JsonBackReference("order-items")
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "stock_id") // <-- THÊM DÒNG NÀY
+    private Stock stock;
 
     private int quantity;
     private double subTotal;

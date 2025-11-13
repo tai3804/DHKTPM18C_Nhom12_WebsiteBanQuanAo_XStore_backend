@@ -26,14 +26,15 @@ public class SecurityConfig {
 
     // Danh sách API public của bạn
     private static final String[] PUBLIC = {
-            "/",
-            "/api/auth/**",
-            "/api/otp/**",
-            "/api/products/**",
-            "/api/product-types/**",
-            "/api/file/**",
-            "/api/carts/**",
-            "/api/cart-items/**"
+        "/", 
+        "/api/auth/**", 
+        "/api/otp/**", 
+        "/api/products/**", 
+        "/api/product-types/**",
+        "/api/file/**",
+        "/api/carts/**",
+        "/api/cart-items/**",
+            "/api/orders/**"
     };
 
     @Value("${jwt.key}")

@@ -93,6 +93,7 @@ public class CartItemController {
             CartItem cartItem = cartItemService.addToCart(
                     request.getCartId(),
                     request.getProductId(),
+                    request.getStockId(),
                     request.getQuantity()
             );
 

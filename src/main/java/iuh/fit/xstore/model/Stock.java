@@ -1,5 +1,6 @@
 package iuh.fit.xstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,5 +29,6 @@ public class Stock implements Serializable {
     private Address address;
 
     @OneToMany(mappedBy = "stock")
+    @JsonIgnore
     private List<StockItem> stockItems;
 }

@@ -1,51 +1,26 @@
-package iuh.fit.xstore.model;
+package iuh.fit.xstore.dto.response;
 
-import jakarta.persistence.*;
 import lombok.*;
 
 /**
- * Address entity - Lưu trữ địa chỉ của người dùng
+ * ShipInfoResponse - DTO để trả về thông tin giao hàng
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
 @Builder
-
-@Entity
-@Table(name = "addresses")
-public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ShipInfoResponse {
     private int id;
-
-    // Số nhà/tòa
-    @Column(name = "street_number")
+    private String recipientName;
+    private String recipientPhone;
     private String streetNumber;
-
-    // Tên đường
-    @Column(name = "street_name")
     private String streetName;
-
-    // Phường/Xã
     private String ward;
-
-    // Quận/Huyện
     private String district;
-
-    // Thành phố/Tỉnh
     private String city;
+    private boolean isDefault;
 
-    // Là địa chỉ mặc định không?
-    @Column(name = "is_default")
-    @Builder.Default
-    private boolean isDefault = false;
-
-    /**
-     * Tạo full address string từ các thành phần
-     */
     public String getFullAddress() {
         StringBuilder sb = new StringBuilder();
         if (streetNumber != null && !streetNumber.isEmpty()) {

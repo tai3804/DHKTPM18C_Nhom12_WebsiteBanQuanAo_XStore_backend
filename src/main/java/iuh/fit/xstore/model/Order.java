@@ -41,4 +41,11 @@ public class Order {
     private List<Discount> discounts;
 
     private double total;
+    private double subtotal;           // Tổng tiền hàng trước giảm giá
+    private double discountAmount;     // Số tiền giảm giá
+    private double shippingFee;        // Phí vận chuyển
+    private String paymentMethod;      // CASH, CARD, MOMO, ZALOPAY
+    private String shippingAddress;    // Địa chỉ giao hàng
+    private String phoneNumber;        // Số điện thoại nhận hàng
+    private String notes;              // Ghi chú đơn hàng
 }

@@ -33,6 +33,10 @@ public enum SuccessCode {
     ADDRESS_UPDATED(200, "Address updated successfully"),
     ADDRESS_DELETED(200, "Address deleted successfully"),
 
+    SHIPINFO_CREATED(201, "Ship info created successfully"),
+    SHIPINFO_UPDATED(200, "Ship info updated successfully"),
+    SHIPINFO_DELETED(200, "Ship info deleted successfully"),
+
     FAVOURITE_CREATED(201, "Favourite created successfully"),
     FAVOURITE_DELETED(200, "Favourite deleted successfully"),
 
@@ -68,9 +72,16 @@ public enum SuccessCode {
     CART_CREATED(201, "Cart created successfully"),
     CART_UPDATED(200, "Cart updated successfully"),
     CART_DELETED(200, "Cart deleted successfully"),
+
+    // ===== PAYMENT =====
+    PAYMENT_SUCCESSFUL(200, "Payment successful"),
+    PAYMENT_INITIATED(200, "Payment initiated"),
+    PAYMENT_PENDING(200, "Payment is pending"),
+
 //    ===file===
     FILE_UPLAOD_SUCCESSFULLY(200, "Upload file successfully"),
 
+    SUCCESS(200, "Request successful"),
     FETCH_SUCCESS(200, "Data fetched successfully");
 
     private final int code;

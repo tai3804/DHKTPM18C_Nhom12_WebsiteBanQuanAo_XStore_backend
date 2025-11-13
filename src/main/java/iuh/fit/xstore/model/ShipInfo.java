@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 /**
- * Address entity - Lưu trữ địa chỉ của người dùng
+ * ShipInfo entity - Lưu trữ thông tin giao hàng (người nhận, số điện thoại, địa chỉ)
  */
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,11 +15,24 @@ import lombok.*;
 @Builder
 
 @Entity
-@Table(name = "addresses")
-public class Address {
+@Table(name = "ship_infos")
+public class ShipInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    // Liên kết đến User
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    // Tên người nhận
+    @Column(name = "recipient_name", nullable = false)
+    private String recipientName;
+
+    // Số điện thoại người nhận
+    @Column(name = "recipient_phone", nullable = false)
+    private String recipientPhone;
 
     // Số nhà/tòa
     @Column(name = "street_number")

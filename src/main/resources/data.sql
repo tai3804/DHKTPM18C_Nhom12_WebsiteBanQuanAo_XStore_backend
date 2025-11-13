@@ -1,25 +1,25 @@
 -- Sample data for testing stock items functionality
 
 -- Insert sample stocks (warehouses)
-INSERT INTO stocks (id, name, phone, email, address_id) VALUES 
+INSERT IGNORE INTO stocks (id, name, phone, email, address_id) VALUES 
 (1, 'Kho Hà Nội', '0123456789', 'hanoi@xstore.com', null),
 (2, 'Kho Hồ Chí Minh', '0987654321', 'hcm@xstore.com', null),
 (3, 'Kho Đà Nẵng', '0555666777', 'danang@xstore.com', null);
 
 -- Insert sample product types
-INSERT INTO product_types (id, name, description) VALUES
+INSERT IGNORE INTO product_types (id, name, description) VALUES
 (1, 'Áo thun', 'Áo thun nam nữ'),
 (2, 'Quần jeans', 'Quần jeans các loại'),
 (3, 'Giày dép', 'Giày dép thời trang');
 
 -- Insert sample products (removed size and color fields)
-INSERT INTO products (id, name, description, image, product_type_id, brand, fabric, price_in_stock, price) VALUES
+INSERT IGNORE INTO products (id, name, description, image, product_type_id, brand, fabric, price_in_stock, price) VALUES
 (1, 'Áo thun cổ tròn', 'Áo thun cổ tròn basic thoải mái', 'https://via.placeholder.com/400', 1, 'X-Store', 'Cotton', 150000, 200000),
 (2, 'Quần jeans slim fit', 'Quần jeans slim fit hiện đại', 'https://via.placeholder.com/400', 2, 'X-Store', 'Denim', 400000, 500000),
 (3, 'Giày sneaker', 'Giày sneaker thể thao', 'https://via.placeholder.com/400', 3, 'X-Store', 'Canvas', 600000, 750000);
 
 -- Insert product colors
-INSERT INTO product_colors (id, name, hex_code, product_id) VALUES
+INSERT IGNORE INTO product_colors (id, name, hex_code, product_id) VALUES
 -- Áo thun colors
 (1, 'Trắng', '#FFFFFF', 1),
 (2, 'Đen', '#000000', 1),
@@ -34,7 +34,7 @@ INSERT INTO product_colors (id, name, hex_code, product_id) VALUES
 (7, 'Đen', '#000000', 3);
 
 -- Insert product sizes
-INSERT INTO product_sizes (id, name, description, product_id) VALUES
+INSERT IGNORE INTO product_sizes (id, name, description, product_id) VALUES
 -- Áo thun sizes
 (1, 'S', 'Small - 48-52kg', 1),
 (2, 'M', 'Medium - 53-58kg', 1),
@@ -54,7 +54,7 @@ INSERT INTO product_sizes (id, name, description, product_id) VALUES
 (12, '42', '42 EU - 26.5cm', 3);
 
 -- Insert stock items (quantity in each warehouse for each product)
-INSERT INTO stock_items (id, stock_id, product_id, quantity) VALUES
+INSERT IGNORE INTO stock_items (id, stock_id, product_id, quantity) VALUES
 -- Áo thun cổ tròn
 (1, 1, 1, 50),  -- Kho Hà Nội: 50 cái
 (2, 2, 1, 30),  -- Kho HCM: 30 cái  

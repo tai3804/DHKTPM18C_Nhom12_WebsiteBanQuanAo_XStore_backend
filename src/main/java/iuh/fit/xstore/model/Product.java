@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(exclude = {"colors", "sizes", "orderItems"})
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"colors", "sizes", "orderItems"})
 @Builder
 
 @Entity

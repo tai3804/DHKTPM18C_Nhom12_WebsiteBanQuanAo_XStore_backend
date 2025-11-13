@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString(exclude = "product")
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "product")
 @Builder
 
 @Entity

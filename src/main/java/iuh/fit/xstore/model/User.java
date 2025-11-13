@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,6 +33,11 @@ public class User {
     private String phone;
     private String avatar;
 
+    // Số điện thoại đã được xác thực qua OTP chưa?
+    @Column(name = "is_phone_verified")
+    @Builder.Default
+    private boolean isPhoneVerified = false;
+
     @Builder.Default
     private int point = 0; // diem de xet loai user
 
@@ -52,4 +58,8 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     private Cart cart;
+
+    // One-to-Many relationship với ShipInfo
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShipInfo> shipInfos;
 }

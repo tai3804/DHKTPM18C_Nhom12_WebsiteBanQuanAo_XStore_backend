@@ -26,6 +26,10 @@ public class CartItem {
 
     private int quantity;
     private double subTotal;
+    
+    // Color & Size selection
+    private String color;          // Màu sắc được chọn
+    private String size;           // Kích cỡ được chọn
 
     @ManyToOne
     @JoinColumn(name = "cart_id")

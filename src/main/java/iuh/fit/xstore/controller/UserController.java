@@ -32,6 +32,12 @@ public class UserController {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.findByUsername(username));
     }
 
+    // SEARCH USERS
+    @GetMapping("/search/query")
+    public ApiResponse<List<User>> searchUsers(@RequestParam String query) {
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.searchUsers(query));
+    }
+
     @PostMapping()
     ApiResponse<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);

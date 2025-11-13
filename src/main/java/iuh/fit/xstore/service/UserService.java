@@ -34,6 +34,13 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
+    public List<User> searchUsers(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return findAll();
+        }
+        return userRepo.searchUsers(query.toLowerCase());
+    }
+
     //tao user
 
     public User createUser(User user) {

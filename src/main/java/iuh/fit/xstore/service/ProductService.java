@@ -14,6 +14,7 @@ import iuh.fit.xstore.repository.ProductSizeRepository;
 import iuh.fit.xstore.repository.StockItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -53,13 +54,69 @@ public class ProductService {
         return productRepository.findByBrand(brand);
     }
     
+    @Transactional
     public Product createProduct(Product product) {
-        if (productRepository.existsById(product.getId())) {
-            throw new AppException(ErrorCode.PRODUCT_EXISTED);
+        // ✅ Khi tạo mới, ID sẽ được tự động generate, không cần check existsById
+        System.out.println("🔧 Creating product: " + product.getName());
+        System.out.println("   Colors: " + (product.getColors() != null ? product.getColors().size() : 0));
+        if (product.getColors() != null) {
+            product.getColors().forEach(c -> System.out.println("   - Color: " + c.getName() + " (#" + c.getHexCode() + ")"));
         }
-        return productRepository.save(product);
+        System.out.println("   Sizes: " + (product.getSizes() != null ? product.getSizes().size() : 0));
+        if (product.getSizes() != null) {
+            product.getSizes().forEach(s -> System.out.println("   - Size: " + s.getName()));
+        }
+        
+        // Lưu product trước (ID sẽ được generate)
+        Product savedProduct = productRepository.save(product);
+        System.out.println("✅ Product saved with ID: " + savedProduct.getId());
+        
+        // ✅ Lưu colors
+        if (product.getColors() != null && !product.getColors().isEmpty()) {
+            System.out.println("🎨 Saving " + product.getColors().size() + " colors...");
+            for (ProductColor color : product.getColors()) {
+                // Không set ID - let Hibernate generate new ID
+                color.setProduct(savedProduct);
+                ProductColor saved = productColorRepository.save(color);
+                System.out.println("   ✅ Color saved: " + saved.getName() + " with ID: " + saved.getId());
+            }
+        }
+        
+        // ✅ Lưu sizes
+        if (product.getSizes() != null && !product.getSizes().isEmpty()) {
+            System.out.println("📏 Saving " + product.getSizes().size() + " sizes...");
+            for (ProductSize size : product.getSizes()) {
+                // Không set ID - let Hibernate generate new ID
+                size.setProduct(savedProduct);
+                ProductSize saved = productSizeRepository.save(size);
+                System.out.println("   ✅ Size saved: " + saved.getName() + " with ID: " + saved.getId());
+            }
+        }
+        
+        // ✅ Flush để chắc chắn dữ liệu được write vào DB
+        productColorRepository.flush();
+        productSizeRepository.flush();
+        
+        // Reload product để lấy colors và sizes từ database
+        Product reloaded = productRepository.findById(savedProduct.getId()).orElse(savedProduct);
+        
+        // Force initialize colors và sizes (vì là LAZY load)
+        if (reloaded.getColors() != null) {
+            reloaded.getColors().size();
+        }
+        if (reloaded.getSizes() != null) {
+            reloaded.getSizes().size();
+        }
+        
+        System.out.println("✅ Product reloaded with " + 
+            (reloaded.getColors() != null ? reloaded.getColors().size() : 0) + 
+            " colors and " + 
+            (reloaded.getSizes() != null ? reloaded.getSizes().size() : 0) + 
+            " sizes");
+        return reloaded;
     }
     
+    @Transactional
     public Product updateProduct(Product product) {
         Product existingProduct = productRepository.findById(product.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -72,6 +129,36 @@ public class ProductService {
         existingProduct.setFabric(product.getFabric());
         existingProduct.setPriceInStock(product.getPriceInStock());
         existingProduct.setPrice(product.getPrice());
+        
+        // ✅ Cập nhật colors
+        if (product.getColors() != null && !product.getColors().isEmpty()) {
+            // Xóa colors cũ
+            productColorRepository.deleteByProduct_Id(existingProduct.getId());
+            productColorRepository.flush();
+            
+            // Thêm colors mới
+            for (ProductColor color : product.getColors()) {
+                color.setProduct(existingProduct);
+                productColorRepository.save(color);
+            }
+            productColorRepository.flush();
+            existingProduct.setColors(product.getColors());
+        }
+        
+        // ✅ Cập nhật sizes
+        if (product.getSizes() != null && !product.getSizes().isEmpty()) {
+            // Xóa sizes cũ
+            productSizeRepository.deleteByProduct_Id(existingProduct.getId());
+            productSizeRepository.flush();
+            
+            // Thêm sizes mới
+            for (ProductSize size : product.getSizes()) {
+                size.setProduct(existingProduct);
+                productSizeRepository.save(size);
+            }
+            productSizeRepository.flush();
+            existingProduct.setSizes(product.getSizes());
+        }
         
         return productRepository.save(existingProduct);
     }
@@ -86,7 +173,7 @@ public class ProductService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return productRepository.findAll();
         }
-        return productRepository.searchByName(keyword.trim());
+        return productRepository.searchProducts(keyword.trim().toLowerCase());
     }
 
     public List<Object> getProductStocks(int productId) {
@@ -122,6 +209,38 @@ public class ProductService {
         
         // Get all sizes for this product
         return productSizeRepository.findByProduct_Id(productId);
+    }
+
+    /**
+     * ✅ Xoá một color theo ID
+     */
+    public void deleteProductColor(int colorId) {
+        System.out.println("🗑️ Service: Deleting color ID " + colorId);
+        productColorRepository.deleteById(colorId);
+    }
+
+    /**
+     * ✅ Xoá một size theo ID
+     */
+    public void deleteProductSize(int sizeId) {
+        System.out.println("🗑️ Service: Deleting size ID " + sizeId);
+        productSizeRepository.deleteById(sizeId);
+    }
+
+    /**
+     * ✅ Xoá tất cả colors của một product
+     */
+    public void deleteAllProductColors(int productId) {
+        System.out.println("🗑️ Service: Deleting all colors for product ID " + productId);
+        productColorRepository.deleteByProduct_Id(productId);
+    }
+
+    /**
+     * ✅ Xoá tất cả sizes của một product
+     */
+    public void deleteAllProductSizes(int productId) {
+        System.out.println("🗑️ Service: Deleting all sizes for product ID " + productId);
+        productSizeRepository.deleteByProduct_Id(productId);
     }
 
     /**

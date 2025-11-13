@@ -11,6 +11,7 @@ public enum ErrorCode {
     USER_EXISTED(409, "User already exists"),
 //    OTP
     OTP_INVALID_OR_EXPIRATION(409, "Invalid OTP or had been expiration"),
+    INVALID_INPUT(400, "Invalid input"),
 
 //    === ACCOUNT ===
     ACCOUNT_NOT_FOUND(404, "Account not found"),
@@ -31,6 +32,9 @@ public enum ErrorCode {
 
 //    === ADDRESS ===
     ADDRESS_NOT_FOUND(404, "Address not found"),
+
+//    === SHIP INFO ===
+    SHIPINFO_NOT_FOUND(404, "Ship info not found"),
 
 //    === FAVOURITE ===
     FAVOURITE_EXISTED(409, "Favorite already exists"),
@@ -57,6 +61,7 @@ public enum ErrorCode {
     STOCK_DELETE_FAILED(409, "Cannot delete stock while items remain"),
 
     //cart
+    CART_NOT_FOUND(404, "Cart not found"),
     CART_ITEM_NOT_FOUND(404, "Cart item not found"),
     CART_ITEM_EXISTED(409, "Cart item already exists"),
 
@@ -64,6 +69,19 @@ public enum ErrorCode {
     FILE_EMPTY(400, "File is empty"),
     FILE_UPLOAD_FAILED(400, "Could not upload file"),
 
+//    ===payment===
+    PAYMENT_FAILED(400, "Payment failed, please try again"),
+    PAYMENT_PENDING(400, "Payment is pending"),
+    INVALID_PAYMENT_METHOD(400, "Invalid payment method"),
+    INSUFFICIENT_STOCK(400, "Insufficient stock"),
+    INVALID_DISCOUNT(400, "Discount code is invalid or expired"),
+
+//    ===validation===
+    INVALID_REQUEST(400, "Invalid request"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    FORBIDDEN(403, "Forbidden"),
+
+//    ===unknown===
     UNKNOWN_ERROR(500, "Something went wrong");
 
     private final int code;

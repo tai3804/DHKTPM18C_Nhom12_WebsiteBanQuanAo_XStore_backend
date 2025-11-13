@@ -3,6 +3,9 @@ package iuh.fit.xstore.model;
 import jakarta.persistence.Entity;
 
 public enum OrderStatus {
+    PENDING,             // Chờ xác nhận
+    CONFIRMED,           // Đã xác nhận
+    PROCESSING,          // Đang xử lý
     IN_TRANSIT,          // Đang giao hàng
     PENDING_RECEIPT,     // Chờ nhận hàng
     DELIVERED,           // Đã giao hàng

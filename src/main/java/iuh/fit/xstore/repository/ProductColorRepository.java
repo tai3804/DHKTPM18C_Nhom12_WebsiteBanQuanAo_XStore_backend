@@ -10,4 +10,7 @@ import java.util.List;
 public interface ProductColorRepository extends JpaRepository<ProductColor, Integer> {
     List<ProductColor> findByProduct_Id(int productId);
     void deleteByProduct_Id(int productId);
+    
+    // ✅ JpaRepository đã có flush() method từ PagingAndSortingRepository
+    // Không cần khai báo lại
 }

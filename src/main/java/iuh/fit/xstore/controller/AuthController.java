@@ -3,6 +3,8 @@ package iuh.fit.xstore.controller;
 import iuh.fit.xstore.dto.request.LoginRequest;
 import iuh.fit.xstore.dto.request.RegisterRequest;
 import iuh.fit.xstore.dto.request.ResetPasswordRequest;
+import iuh.fit.xstore.dto.request.SendOtpRequest;
+import iuh.fit.xstore.dto.request.VerifyOtpRequest;
 import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.dto.response.SuccessCode;
@@ -13,6 +15,7 @@ import iuh.fit.xstore.model.User;
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.security.UserDetail;
 import iuh.fit.xstore.service.JwtService;
+import iuh.fit.xstore.service.OtpService;
 import iuh.fit.xstore.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ public class AuthController {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private JwtService jwtUtil;
+    private OtpService otpService;
 
     @PostMapping("/login")
     public ApiResponse<?> login(@RequestBody LoginRequest request) {
@@ -119,5 +123,62 @@ public class AuthController {
         userRepository.save(user);
 
         return new ApiResponse<>(SuccessCode.RESET_PASSWORD_SUCCESSFULLY, user);
+    }
+
+    // ================= PHONE OTP VERIFICATION =================
+    @PostMapping("/send-otp")
+    public ApiResponse<?> sendOtp(@RequestBody SendOtpRequest request) {
+        try {
+            if (request.getPhoneNumber() == null || request.getPhoneNumber().trim().isEmpty()) {
+                return new ApiResponse<>(ErrorCode.INVALID_INPUT);
+            }
+
+            String otp = otpService.generateOtp(request.getPhoneNumber());
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("message", "OTP sent successfully to " + request.getPhoneNumber());
+            data.put("expiryMinutes", 5);
+
+            log.info("OTP sent to phone: {}", request.getPhoneNumber());
+            return new ApiResponse<>(SuccessCode.OTP_SEND_SUCCESSFULLY, data);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid phone format: {}", e.getMessage());
+            return new ApiResponse<>(ErrorCode.INVALID_INPUT);
+        } catch (Exception e) {
+            log.error("Error sending OTP: {}", e.getMessage());
+            return new ApiResponse<>(ErrorCode.UNKNOWN_ERROR);
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ApiResponse<?> verifyOtp(@RequestBody VerifyOtpRequest request) {
+        try {
+            if (request.getPhoneNumber() == null || request.getPhoneNumber().trim().isEmpty()) {
+                return new ApiResponse<>(ErrorCode.INVALID_INPUT);
+            }
+            if (request.getOtp() == null || request.getOtp().trim().isEmpty()) {
+                return new ApiResponse<>(ErrorCode.INVALID_INPUT);
+            }
+
+            // Verify OTP
+            boolean isValid = otpService.verifyOtp(request.getPhoneNumber(), request.getOtp().trim());
+            
+            if (!isValid) {
+                return new ApiResponse<>(ErrorCode.OTP_INVALID_OR_EXPIRATION);
+            }
+
+            // OTP verified - update user's phone and verification status
+            // This is done when user is logged in and updates their account
+            log.info("OTP verified successfully for phone: {}", request.getPhoneNumber());
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("message", "Phone verified successfully");
+            data.put("phoneNumber", request.getPhoneNumber());
+
+            return new ApiResponse<>(SuccessCode.OTP_VALID, data);
+        } catch (Exception e) {
+            log.error("Error verifying OTP: {}", e.getMessage());
+            return new ApiResponse<>(ErrorCode.UNKNOWN_ERROR);
+        }
     }
 }

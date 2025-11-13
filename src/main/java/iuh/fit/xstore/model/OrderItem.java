@@ -35,5 +35,8 @@ public class OrderItem {
     private Product product;
 
     private int quantity;
+    private double unitPrice;      // Giá đơn vị tại thời điểm mua
     private double subTotal;
+    private String color;          // Màu sắc được chọn
+    private String size;           // Kích cỡ được chọn
 }

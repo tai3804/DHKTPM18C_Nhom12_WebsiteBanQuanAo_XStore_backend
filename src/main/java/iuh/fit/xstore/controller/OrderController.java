@@ -1,11 +1,13 @@
 package iuh.fit.xstore.controller;
 
+import iuh.fit.xstore.dto.request.CheckoutRequest;
 import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.dto.response.SuccessCode;
 import iuh.fit.xstore.model.Order;
 import iuh.fit.xstore.model.OrderItem;
 import iuh.fit.xstore.service.OrderService;
+import iuh.fit.xstore.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     // ========== ORDER ==========
     @GetMapping
@@ -99,5 +102,36 @@ public class OrderController {
         var deletedId = orderService.deleteOrderItem(id);
         return new ApiResponse<>(SuccessCode.ORDER_ITEM_DELETED.getCode(),
                 SuccessCode.ORDER_ITEM_DELETED.getMessage(), deletedId);
+    }
+
+    // ========== CHECKOUT & PAYMENT ==========
+    @PostMapping("/checkout")
+    public ApiResponse<Order> checkout(@RequestBody CheckoutRequest request) {
+        Order order = paymentService.processCheckout(request);
+        
+        // Xử lý thanh toán
+        if (paymentService.processPayment(order, request.getPaymentMethod())) {
+            return new ApiResponse<>(SuccessCode.ORDER_CREATED.getCode(),
+                    "Thanh toán thành công! Đơn hàng đã được tạo.", order);
+        } else {
+            return new ApiResponse<>(ErrorCode.PAYMENT_FAILED.getCode(),
+                    "Thanh toán thất bại. Vui lòng thử lại.", null);
+        }
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ApiResponse<String> cancelOrder(
+            @PathVariable int orderId,
+            @RequestParam(defaultValue = "Khách hàng yêu cầu") String reason) {
+        paymentService.cancelOrder(orderId, reason);
+        return new ApiResponse<>(SuccessCode.ORDER_DELETED.getCode(),
+                "Đơn hàng đã được hủy.", "success");
+    }
+
+    @GetMapping("/user/{userId}")
+    public ApiResponse<List<Order>> getUserOrders(@PathVariable int userId) {
+        List<Order> orders = paymentService.getUserOrders(userId);
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
+                SuccessCode.FETCH_SUCCESS.getMessage(), orders);
     }
 }

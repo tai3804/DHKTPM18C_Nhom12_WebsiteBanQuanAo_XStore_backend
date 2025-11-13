@@ -63,4 +63,20 @@ public class AccountService {
         return id;
 
     }
+
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        Account account = findByUsername(username);
+
+        if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD); // dùng cái enum có sẵn
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new AppException(ErrorCode.PASSWORD_EMPTY);
+        }
+
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepo.save(account);
+    }
+
 }

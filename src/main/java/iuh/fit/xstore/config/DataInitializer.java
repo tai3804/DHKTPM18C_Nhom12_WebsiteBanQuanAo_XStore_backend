@@ -50,7 +50,7 @@ public class DataInitializer {
                         .account(
                                 Account.builder()
                                         .username("hien")
-                                        .password(passwordEncoder.encode("hienhien"))
+                                        .password(passwordEncoder.encode("hien"))
                                         .role(Role.CUSTOMER)
                                         .build()
                         )
@@ -62,7 +62,7 @@ public class DataInitializer {
                         .build();
 
                 userRepo.save(customerUser);
-                log.info("Default customer user created: username=hien, password=hienhien");
+                log.info("Default customer user created: username=hien, password=hien");
             }
         };
     }

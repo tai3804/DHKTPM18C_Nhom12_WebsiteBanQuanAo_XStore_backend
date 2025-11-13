@@ -1,5 +1,6 @@
 package iuh.fit.xstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class ShipInfo {
     // Liên kết đến User
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore // Ngăn circular reference với User
     private User user;
 
     // Tên người nhận

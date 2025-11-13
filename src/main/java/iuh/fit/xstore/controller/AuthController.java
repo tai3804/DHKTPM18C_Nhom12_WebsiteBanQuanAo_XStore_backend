@@ -39,6 +39,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class AuthController {
 
+    private final AccountRepository accountRepository;
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;

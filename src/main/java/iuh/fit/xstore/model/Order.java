@@ -34,10 +34,11 @@ public class Order {
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("order-items")
     private List<OrderItem> orderItems;
 
     @OneToMany(mappedBy = "order")
-    @JsonManagedReference
+    @JsonManagedReference("order-discounts")
     private List<Discount> discounts;
 
     private double total;

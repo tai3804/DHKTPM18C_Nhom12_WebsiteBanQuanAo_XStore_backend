@@ -2,12 +2,8 @@ package iuh.fit.xstore.service;
 
 import iuh.fit.xstore.dto.response.AppException; // <-- Import
 import iuh.fit.xstore.dto.response.ErrorCode; // <-- Import
-import iuh.fit.xstore.model.Cart;
-import iuh.fit.xstore.model.CartItem;
-import iuh.fit.xstore.model.Product;
-import iuh.fit.xstore.repository.CartItemRepository;
-import iuh.fit.xstore.repository.CartRepository;
-import iuh.fit.xstore.repository.ProductRepository;
+import iuh.fit.xstore.model.*;
+import iuh.fit.xstore.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +20,10 @@ public class CartItemService {
     private CartRepository cartRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private StockItemRepository stockItemRepository;
 
     public List<CartItem> getAllCartItems() {
         return cartItemRepository.findAll();
@@ -39,42 +39,71 @@ public class CartItemService {
     }
 
     @Transactional
-    public CartItem addToCart(Integer cartId, Integer productId, Integer quantity) {
+    public CartItem addToCart(Integer cartId, Integer productId, Integer stockId, Integer quantity) {
         if (quantity <= 0) {
-            throw new AppException(ErrorCode.INVALID_QUANTITY); // <-- Sửa lỗi
+            throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
 
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND)); // (Giả sử lỗi này)
+                .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)); // <-- Sửa lỗi
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        // SỬA LOGIC: Kiểm tra item đã tồn tại chưa
-        Optional<CartItem> existingItem = cartItemRepository
-                .findByCartIdAndProductId(cartId, productId);
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new AppException(ErrorCode.STOCK_NOT_FOUND));
+
+        // 1. Tìm số lượng tồn kho thực tế của sản phẩm này tại kho này
+        StockItem stockItem = stockItemRepository.findByStock_IdAndProduct_Id(stockId, productId)
+                .orElseThrow(() -> new AppException(ErrorCode.STOCK_ITEM_NOT_FOUND)); // Ném lỗi nếu sản phẩm không có trong kho này
+
+        int availableQuantity = stockItem.getQuantity();
+
+        if (availableQuantity <= 0) {
+            throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY); // Hết hàng
+        }
+
+        // 2. Tìm xem item này đã có trong giỏ hàng chưa
+        Optional<CartItem> existingItemOpt = cartItemRepository
+                .findByCartIdAndProductIdAndStockId(cartId, productId, stockId);
 
         CartItem cartItem;
-        if (existingItem.isPresent()) {
-            // Đã tồn tại: Cập nhật số lượng
-            cartItem = existingItem.get();
-            Integer newQuantity = cartItem.getQuantity() + quantity;
-            cartItem.setQuantity(newQuantity);
+        int newQuantity; // Biến để tính số lượng mới
+
+        if (existingItemOpt.isPresent()) {
+            // 3. Đã tồn tại: Tính số lượng mới
+            cartItem = existingItemOpt.get();
+            newQuantity = cartItem.getQuantity() + quantity;
         } else {
-            // Chưa tồn tại: Tạo mới
+            // 4. Chưa tồn tại: Tạo mới
             cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
-            cart.getCartItems().add(cartItem); // Thêm vào list của Cart
+            cartItem.setStock(stock); // Lưu stock
+            newQuantity = quantity;
         }
 
-        // Tính subtotal và lưu
+        // --- KIỂM TRA SỐ LƯỢNG MỚI VỚI TỒN KHO ---
+        if (newQuantity > availableQuantity) {
+            // Nếu số lượng trong giỏ VƯỢT QUÁ số lượng có sẵn trong kho
+            throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY);
+        }
+        // --- KẾT THÚC KIỂM TRA ---
+
+        // 5. Set số lượng mới
+        cartItem.setQuantity(newQuantity);
+
+        // Thêm vào list của Cart nếu là item mới (chỉ khi chưa tồn tại)
+        if (!existingItemOpt.isPresent()) {
+            cart.getCartItems().add(cartItem);
+        }
+
+        // 6. Tính subtotal và lưu
         Double subTotal = product.getPrice() * cartItem.getQuantity();
         cartItem.setSubTotal(subTotal);
         cartItem = cartItemRepository.save(cartItem);
 
-        // Cập nhật tổng tiền Cart
+        // 7. Cập nhật tổng tiền Cart
         updateCartTotal(cart);
 
         return cartItem;

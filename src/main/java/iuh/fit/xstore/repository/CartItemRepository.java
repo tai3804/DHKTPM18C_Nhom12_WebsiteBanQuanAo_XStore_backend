@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CartItemRepository extends JpaRepository<CartItem, Integer> { // ✅ Long -> Integer
+public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
 
-    // ✅ Đổi Long thành Integer
     Optional<CartItem> findByCartIdAndProductId(Integer cartId, Integer productId);
 
     List<CartItem> findByCartId(Integer cartId);
+    Optional<CartItem> findByCartIdAndProductIdAndStockId(Integer cartId,Integer productId,Integer stockId);
 }

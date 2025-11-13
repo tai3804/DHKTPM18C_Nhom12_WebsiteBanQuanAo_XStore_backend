@@ -31,8 +31,7 @@ public class SecurityConfig {
         "/api/product-types/**",
         "/api/file/**",
         "/api/carts/**",
-        "/api/cart-items/**",
-        "/uploads/**"
+        "/api/cart-items/**"
     };
 
     @Value("${jwt.key}")

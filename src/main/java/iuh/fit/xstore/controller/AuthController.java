@@ -6,12 +6,14 @@ import iuh.fit.xstore.dto.request.ResetPasswordRequest;
 import iuh.fit.xstore.dto.request.SendOtpRequest;
 import iuh.fit.xstore.dto.request.VerifyOtpRequest;
 import iuh.fit.xstore.dto.response.ApiResponse;
+import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.dto.response.SuccessCode;
 import iuh.fit.xstore.model.Account;
 import iuh.fit.xstore.model.Cart;
 import iuh.fit.xstore.model.Role;
 import iuh.fit.xstore.model.User;
+import iuh.fit.xstore.repository.AccountRepository;
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.security.UserDetail;
 import iuh.fit.xstore.service.JwtService;
@@ -43,6 +45,7 @@ public class AuthController {
     private JwtService jwtUtil;
     private OtpService otpService;
 
+    // (Giữ nguyên /login)
     @PostMapping("/login")
     public ApiResponse<?> login(@RequestBody LoginRequest request) {
         try {
@@ -53,41 +56,31 @@ public class AuthController {
                     )
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             UserDetail userDetail = (UserDetail) authentication.getPrincipal();
             String token = jwtUtil.generateToken(userDetail);
-
-
             User user = userRepository.getByAccountUsername(request.getUsername());
-
             var username = SecurityContextHolder.getContext().getAuthentication();
-
-                log.warn("return: ", username);
-
+            log.warn("return: ", username);
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);
             data.put("user", user);
-
             return new ApiResponse<>(SuccessCode.LOGIN_SUCCESSFULLY, data);
-
-        } catch (UsernameNotFoundException  e) {
+        } catch (UsernameNotFoundException e) {
             return new ApiResponse<>(ErrorCode.USER_NOT_FOUND);
         } catch (BadCredentialsException e) {
             return new ApiResponse<>(ErrorCode.INCORRECT_USERNAME_OR_PASSWORD);
         } catch (Exception e) {
-            // Các lỗi không mong đợi
             e.printStackTrace();
             return new ApiResponse<>(ErrorCode.UNKNOWN_ERROR);
         }
     }
 
-    // ================= REGISTER =================
+    // (Giữ nguyên /register)
     @PostMapping("/register")
     public ApiResponse<?> register(@RequestBody RegisterRequest request) {
         if (userRepository.existsByAccountUsername(request.getUsername())) {
             return new ApiResponse<>(ErrorCode.USER_EXISTED);
         }
-
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -104,23 +97,27 @@ public class AuthController {
                 )
                 .build();
         userRepository.save(user);
-
         return new ApiResponse<>(SuccessCode.REGISTER_SUCCESSFULLY, user);
     }
 
-    // ================= RESET PASSWORD =================
+    // ================= RESET PASSWORD (ĐÃ SỬA THÔNG MINH HƠN) =================
     @PostMapping("/reset-password")
     public ApiResponse<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        User user = userRepository.findByAccountUsername(request.getUsername())
-                .orElse(null);
 
-        if (user == null) {
-            return new ApiResponse<>(ErrorCode.USER_NOT_FOUND);
+        // DTO request.getUsername() bây giờ có thể là EMAIL hoặc SĐT
+        String contact = request.getUsername();
+
+        User user = userRepository.findByEmail(contact)
+                .or(() -> userRepository.findByPhone(contact)) // Thử tìm SĐT
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        Account account = user.getAccount();
+        if (account == null) {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_FOUND);
         }
 
-        // Mã hóa mật khẩu mới
-        user.getAccount().setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account);
 
         return new ApiResponse<>(SuccessCode.RESET_PASSWORD_SUCCESSFULLY, user);
     }

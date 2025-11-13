@@ -1,11 +1,13 @@
 package iuh.fit.xstore.service;
 
+import iuh.fit.xstore.dto.request.ChangePasswordRequest;
 import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.*;
 import iuh.fit.xstore.repository.AccountRepository;
 import iuh.fit.xstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -99,5 +101,34 @@ public class UserService {
         findById(id);
         userRepo.deleteById(id);
         return id;
+    }
+    // === PHƯƠNG THỨC MỚI ĐỂ ĐỔI MẬT KHẨU ===
+    public void changePassword(ChangePasswordRequest request) {
+        // 1. Lấy username của người dùng đang đăng nhập
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (username == null) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 2. Tìm tài khoản
+        Account account = accountRepo.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        // 3. Xác thực mật khẩu cũ
+        if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 4. Kiểm tra mật khẩu mới
+        if (request.getNewPassword() == null || request.getNewPassword().trim().isEmpty()) {
+            throw new AppException(ErrorCode.PASSWORD_EMPTY);
+        }
+
+        // 5. Cập nhật mật khẩu mới (đã mã hóa)
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        // 6. Lưu lại vào database
+        accountRepo.save(account);
     }
 }

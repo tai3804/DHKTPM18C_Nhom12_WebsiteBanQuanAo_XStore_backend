@@ -34,9 +34,14 @@ public class User {
     private String avatar;
 
     // Số điện thoại đã được xác thực qua OTP chưa?
+//    @Column(name = "is_phone_verified")
+//    @Builder.Default
+//    private boolean isPhoneVerified = false;
+
     @Column(name = "is_phone_verified")
     @Builder.Default
-    private boolean isPhoneVerified = false;
+    private Boolean isPhoneVerified = false;
+
 
     @Builder.Default
     private int point = 0; // diem de xet loai user

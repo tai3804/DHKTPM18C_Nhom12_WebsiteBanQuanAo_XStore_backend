@@ -23,6 +23,6 @@ public class ProductCreateRequest {
     private String fabric;
     private double priceInStock;
     private double price;
-    private List<ProductColorDTO> colors = new ArrayList<>();
-    private List<ProductSizeDTO> sizes = new ArrayList<>();
+
+    private List<ProductInfoRequest> productInfos;
 }

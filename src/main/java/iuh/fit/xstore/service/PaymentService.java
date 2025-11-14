@@ -69,6 +69,7 @@ public class PaymentService {
                         request.getPaymentMethod() : "CASH")
                 .shippingAddress(request.getShippingAddress())
                 .phoneNumber(request.getPhoneNumber())
+                .recipientName(request.getRecipientName())
                 .notes(request.getNotes() != null ? request.getNotes() : "")
                 .build();
 
@@ -130,9 +131,9 @@ public class PaymentService {
             Discount discount = discountRepo.findById(request.getDiscountId())
                     .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
 
-            // Kiểm tra discount có hợp lệ không
-            if (!discount.isValid()) {
-                log.warn("⚠️ Discount code is invalid or expired: {}", discount.getId());
+            // Kiểm tra discount có hợp lệ không với user hiện tại
+            if (!discount.isValidForUser(user)) {
+                log.warn("⚠️ Discount code is invalid, expired, or not applicable for user type: {}", discount.getId());
                 throw new AppException(ErrorCode.INVALID_DISCOUNT);
             }
 
@@ -157,6 +158,38 @@ public class PaymentService {
         double shippingFee = calculateShippingFee(request.getShippingAddress());
         if (shippingFee < 0) {
             shippingFee = 0;
+        }
+
+        // Áp dụng giảm giá phí vận chuyển nếu có
+        if (request.getShippingDiscountId() != null && request.getShippingDiscountId() > 0) {
+            Discount shippingDiscount = discountRepo.findById(request.getShippingDiscountId())
+                    .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+            // Kiểm tra discount có hợp lệ không
+            if (!shippingDiscount.isValidForUser(user)) {
+                log.warn("⚠️ Shipping discount is invalid for user: {}", shippingDiscount.getId());
+                throw new AppException(ErrorCode.INVALID_DISCOUNT);
+            }
+
+            // Tính giảm giá cho shipping
+            double shippingDiscountAmount = 0;
+            if (shippingDiscount.getType().equals("PERCENTAGE")) {
+                shippingDiscountAmount = shippingFee * (shippingDiscount.getDiscountPercent() / 100);
+                if (shippingDiscount.getDiscountAmount() > 0 &&
+                    shippingDiscountAmount > shippingDiscount.getDiscountAmount()) {
+                    shippingDiscountAmount = shippingDiscount.getDiscountAmount();
+                }
+            } else {
+                shippingDiscountAmount = Math.min(shippingDiscount.getDiscountAmount(), shippingFee);
+            }
+
+            shippingFee -= shippingDiscountAmount;
+            if (shippingFee < 0) shippingFee = 0;
+
+            // Tăng số lần sử dụng
+            shippingDiscount.setUsageCount(shippingDiscount.getUsageCount() + 1);
+            discountRepo.save(shippingDiscount);
+            log.info("✅ Shipping discount applied: {} (Amount: {}₫)", shippingDiscount.getId(), shippingDiscountAmount);
         }
 
         // 7. Tính tổng tiền
@@ -215,13 +248,9 @@ public class PaymentService {
             Cart cart = cartRepo.findById(cartId)
                     .orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
             
-            // Xóa tất cả items trước
-            if (cart.getCartItems() != null && !cart.getCartItems().isEmpty()) {
-                cartItemRepo.deleteAll(cart.getCartItems());
-            }
-
-            // Sau đó clear list
-            cart.setCartItems(new ArrayList<>());
+            // Xóa tất cả items bằng cách clear collection và save
+            // orphanRemoval = true sẽ tự động delete các items
+            cart.getCartItems().clear();
             cartRepo.save(cart);
             
             log.info("✅ Cart cleared successfully: {}", cartId);

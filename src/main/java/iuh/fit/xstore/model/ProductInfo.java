@@ -8,25 +8,24 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"stock", "product"}) // tránh đệ quy
-@EqualsAndHashCode
+@ToString(exclude = "product")
+@EqualsAndHashCode(exclude = "product")
 @Builder
 @Entity
-@Table(name = "stock_items")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class StockItem {
-
+@Table(name = "product_info")
+public class ProductInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_id")
-    private Stock stock;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties({"productInfos", "comments", "orderItems", "stockItems"})
     private Product product;
 
+    private String colorName;
+    private String colorHexCode;
+    private String sizeName;
     private int quantity;
+    private String image;
 }

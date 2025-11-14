@@ -1,6 +1,7 @@
 package iuh.fit.xstore.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +35,9 @@ public class Discount {
     // Loại discount: FIXED, PERCENT
     private String type;
     
+    // Category: PRODUCT (giảm tiền), SHIPPING (giảm ship)
+    private String category;
+    
     // Usage tracking
     private int usageCount;
     private int maxUsage;
@@ -46,7 +50,13 @@ public class Discount {
     private LocalDate endDate;
     
     @Column(name = "is_active")
-    private boolean isActive;
+    @JsonProperty("isActive")
+    private Boolean isActive;
+
+    // Loại user được phép sử dụng discount này
+    @Column(name = "valid_user_type")
+    @Enumerated(EnumType.STRING)
+    private UserType validUserType;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -72,6 +82,26 @@ public class Discount {
         if (endDate != null && now.isAfter(endDate)) return false;
         
         if (maxUsage > 0 && usageCount >= maxUsage) return false;
+        
+        return true;
+    }
+
+    /**
+     * Kiểm tra discount có hợp lệ không với user cụ thể
+     * - Phải active
+     * - Chưa hết hạn
+     * - Chưa vượt maxUsage
+     * - UserType của user phải khớp với validUserType (nếu có)
+     */
+    public boolean isValidForUser(User user) {
+        if (!isValid()) return false;
+        
+        // Nếu validUserType được set, kiểm tra user type
+        if (validUserType != null) {
+            if (user == null || user.getUserType() != validUserType) {
+                return false;
+            }
+        }
         
         return true;
     }

@@ -1,5 +1,7 @@
 package iuh.fit.xstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +19,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,8 +55,15 @@ public class User {
     @Builder.Default
     private UserType userType = UserType.COPPER; // loai user (tich diem) dong - bac - vang
 
+    @Transient
+    private String rawPassword;
+
+    @Transient
+    private Role role;
+
     @OneToOne
     @JoinColumn(name = "address_id")
+    @JsonIgnore
     private Address address;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -62,9 +72,16 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
+    @JsonIgnore
     private Cart cart;
 
     // One-to-Many relationship với ShipInfo
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<ShipInfo> shipInfos;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Comment> comments;
+
 }

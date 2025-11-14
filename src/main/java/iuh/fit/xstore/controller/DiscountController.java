@@ -18,7 +18,10 @@ public class DiscountController {
 
     @GetMapping
     ApiResponse<List<Discount>> getDiscounts() {
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, discountService.findAll());
+        List<Discount> discounts = discountService.findAll();
+        System.out.println("📋 Fetching discounts, first discount isActive: " + 
+            (discounts.isEmpty() ? "N/A" : discounts.get(0).getIsActive()));
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, discounts);
     }
 
     @GetMapping("/{id}")

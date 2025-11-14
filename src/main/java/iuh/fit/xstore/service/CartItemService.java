@@ -39,7 +39,7 @@ public class CartItemService {
     }
 
     @Transactional
-    public CartItem addToCart(Integer cartId, Integer productId, Integer stockId, Integer quantity) {
+    public CartItem addToCart(Integer cartId, Integer productId, Integer stockId, Integer quantity, String color, String size) {
         if (quantity <= 0) {
             throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
@@ -65,7 +65,7 @@ public class CartItemService {
 
         // 2. Tìm xem item này đã có trong giỏ hàng chưa
         Optional<CartItem> existingItemOpt = cartItemRepository
-                .findByCartIdAndProductIdAndStockId(cartId, productId, stockId);
+                .findByCartIdAndProductIdAndStockIdAndColorAndSize(cartId, productId, stockId, color, size);
 
         CartItem cartItem;
         int newQuantity; // Biến để tính số lượng mới
@@ -80,6 +80,8 @@ public class CartItemService {
             cartItem.setCart(cart);
             cartItem.setProduct(product);
             cartItem.setStock(stock); // Lưu stock
+            cartItem.setColor(color);
+            cartItem.setSize(size);
             newQuantity = quantity;
         }
 

@@ -45,9 +45,9 @@ public class OrderController {
                 SuccessCode.ORDER_CREATED.getMessage(), created);
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<Order> updateOrder(@PathVariable int id, @RequestBody Order order) {
-        var updated = orderService.updateOrder(id, order);
+    @PutMapping("/{id}/status")
+    public ApiResponse<Order> updateOrderStatus(@PathVariable int id, @RequestBody String status) {
+        var updated = orderService.updateOrderStatus(id, status.replace("\"", "")); // Remove quotes from JSON string
         if (updated == null)
             return new ApiResponse<>(ErrorCode.ORDER_NOT_FOUND.getCode(),
                     ErrorCode.ORDER_NOT_FOUND.getMessage(), null);

@@ -5,8 +5,10 @@ import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.*;
 import iuh.fit.xstore.repository.AccountRepository;
+import iuh.fit.xstore.repository.CartRepository;
 import iuh.fit.xstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepo;
     private final AccountRepository accountRepo;
+    private final CartRepository cartRepo;
     private final PasswordEncoder passwordEncoder;
 
     public List<User> findAll() {
@@ -46,38 +50,56 @@ public class UserService {
     //tao user
 
     public User createUser(User user) {
-        // --- Kiểm tra tài khoản đã tồn tại ---
-        if (userRepo.existsByAccountUsername(user.getAccount().getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        log.info("Creating user with email: {}, firstName: {}", user.getEmail(), user.getFirstName());
+        try {
+            // --- Kiểm tra tài khoản đã tồn tại ---
+            if (userRepo.existsByEmail(user.getEmail())){
+                log.error("User with email {} already exists", user.getEmail());
+                throw new AppException(ErrorCode.USERNAME_EXISTED);
+            }
+
+            // --- Kiểm tra password ---
+            if (user.getAccount() == null || user.getAccount().getPassword() == null || user.getAccount().getPassword().trim().isEmpty()) {
+                log.error("Password is empty for user {}", user.getEmail());
+                throw new AppException(ErrorCode.PASSWORD_EMPTY);
+            }
+
+            // --- Tạo mới Account ---
+            Account account = Account.builder()
+                    .username(user.getAccount().getUsername() != null ? user.getAccount().getUsername() : user.getEmail())
+                    .password(passwordEncoder.encode(user.getAccount().getPassword()))
+                    .role(user.getAccount().getRole() != null ? user.getAccount().getRole() : Role.CUSTOMER)
+                    .build();
+            account = accountRepo.save(account);
+            log.info("Account created with username: {}", account.getUsername());
+
+            // --- Tạo giỏ hàng mặc định ---
+            Cart cart = Cart.builder()
+                    .total(0)
+                    .build();
+            cart = cartRepo.save(cart); // Save cart first
+            log.info("Cart created with id: {}", cart.getId());
+
+            // --- Tạo mới User ---
+            User newUser = User.builder()
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .dob(user.getDob())
+                    .email(user.getEmail())
+                    .phone(user.getPhone())
+                    .userType(user.getUserType() != null ? user.getUserType() : UserType.COPPER)
+                    .point(0)
+                    .account(account)
+                    .cart(cart)
+                    .build();
+
+            User savedUser = userRepo.save(newUser);
+            log.info("User created successfully with id: {}", savedUser.getId());
+            return savedUser;
+        } catch (Exception e) {
+            log.error("Error creating user: ", e);
+            throw e;
         }
-
-        // --- Tạo mới Account ---
-        Account account = user.getAccount();
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
-        if (account.getRole().equals(Role.ADMIN)) {
-            account.setRole(Role.ADMIN);
-        }else account.setRole(Role.CUSTOMER);
-        account = accountRepo.save(account);
-
-        // --- Tạo giỏ hàng mặc định ---
-        Cart cart = Cart.builder()
-                .total(0)
-                .build();
-
-        // --- Tạo mới User ---
-        User newUser = User.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .dob(user.getDob())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .userType(UserType.COPPER)
-                .point(0)
-                .account(account)
-                .cart(cart)
-                .build();
-
-        return userRepo.save(newUser);
     }
 
 

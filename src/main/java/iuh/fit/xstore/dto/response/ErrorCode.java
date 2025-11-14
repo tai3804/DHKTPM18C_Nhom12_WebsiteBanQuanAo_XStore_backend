@@ -29,6 +29,8 @@ public enum ErrorCode {
     PRODUCT_EXISTED(409, "Product already exists"),
     PRODUCT_TYPE_NOT_FOUND(404, "Product type not found"),
     PRODUCT_TYPE_EXISTED(409, "Product type already exists"),
+    PRODUCT_INFO_NOT_FOUND(404, "Product info not found"),
+    PRODUCT_INFO_EXISTED(409, "Product info already exists"),
 
 //    === ADDRESS ===
     ADDRESS_NOT_FOUND(404, "Address not found"),

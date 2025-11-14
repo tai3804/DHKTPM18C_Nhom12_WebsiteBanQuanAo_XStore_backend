@@ -12,4 +12,6 @@ public class AddToCartRequest {
     private Integer productId;
     private Integer stockId;
     private Integer quantity = 1;
+    private String color;
+    private String size;
 }

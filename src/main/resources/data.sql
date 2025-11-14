@@ -5,9 +5,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Xóa dữ liệu cũ (nếu có)
+DELETE FROM product_info WHERE id > 0;
 DELETE FROM stock_items WHERE id > 0;
-DELETE FROM product_sizes WHERE id > 0;
-DELETE FROM product_colors WHERE id > 0;
 DELETE FROM products WHERE id > 0;
 DELETE FROM product_types WHERE id > 0;
 DELETE FROM stocks WHERE id > 0;
@@ -75,72 +74,96 @@ INSERT IGNORE INTO products (id, name, description, image, product_type_id, bran
 
 (18, 'Thắt Lưng Da Nam', 'Thắt lưng da nam genuine leather. Mặt khóa kim loại cao cấp, thiết kế cổ điển sang trọng.', 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=400', 6, 'X-Store', 'Genuine Leather', 290000, 419000);
 
--- Insert product colors (màu sắc sản phẩm)
-INSERT IGNORE INTO product_colors (id, name, hex_code, product_id) VALUES
--- Áo Thun Nam Basic (1)
-(1, 'Trắng', '#FFFFFF', 1), (2, 'Đen', '#000000', 1), (3, 'Xám', '#6B7280', 1), (4, 'Navy', '#1E3A8A', 1),
--- Áo Sơ Mi Nam (2) 
-(5, 'Trắng', '#FFFFFF', 2), (6, 'Xanh Nhạt', '#DBEAFE', 2), (7, 'Hồng Nhạt', '#FCE7F3', 2),
--- Áo Hoodie Nam (3)
-(8, 'Đen', '#000000', 3), (9, 'Xám', '#6B7280', 3), (10, 'Navy', '#1E3A8A', 3),
--- Áo Thun Nữ (4)
-(11, 'Trắng', '#FFFFFF', 4), (12, 'Hồng', '#EC4899', 4), (13, 'Vàng', '#F59E0B', 4),
--- Áo Blouse Nữ (5)
-(14, 'Trắng', '#FFFFFF', 5), (15, 'Be', '#F3E8FF', 5), (16, 'Xanh Mint', '#A7F3D0', 5),
--- Blazer Nữ (6)
-(17, 'Đen', '#000000', 6), (18, 'Navy', '#1E3A8A', 6), (19, 'Xám', '#6B7280', 6),
--- Jeans Nam (7)
-(20, 'Xanh Đậm', '#1E40AF', 7), (21, 'Xanh Nhạt', '#3B82F6', 7), (22, 'Đen', '#000000', 7),
--- Kaki Nam (8)
-(23, 'Be', '#D97706', 8), (24, 'Xám', '#6B7280', 8), (25, 'Navy', '#1E3A8A', 8),
--- Short Nam (9)
-(26, 'Đen', '#000000', 9), (27, 'Xám', '#6B7280', 9), (28, 'Navy', '#1E3A8A', 9),
--- Jeans Nữ (10)
-(29, 'Xanh Đậm', '#1E40AF', 10), (30, 'Xanh Nhạt', '#3B82F6', 10), (31, 'Đen', '#000000', 10),
--- Chân Váy (11)
-(32, 'Đen', '#000000', 11), (33, 'Be', '#D97706', 11), (34, 'Hồng', '#EC4899', 11),
--- Culottes (12)
-(35, 'Đen', '#000000', 12), (36, 'Trắng', '#FFFFFF', 12), (37, 'Xám', '#6B7280', 12),
--- Sneaker Nam (13)
-(38, 'Trắng', '#FFFFFF', 13), (39, 'Đen', '#000000', 13), (40, 'Xám', '#6B7280', 13),
--- Boot Nữ (14)
-(41, 'Đen', '#000000', 14), (42, 'Nâu', '#92400E', 14),
--- Sandal Nữ (15)
-(43, 'Đen', '#000000', 15), (44, 'Nâu', '#92400E', 15), (45, 'Be', '#D97706', 15),
--- Túi Tote (16)
-(46, 'Be', '#D97706', 16), (47, 'Đen', '#000000', 16), (48, 'Navy', '#1E3A8A', 16),
--- Nón Snapback (17)
-(49, 'Đen', '#000000', 17), (50, 'Xám', '#6B7280', 17), (51, 'Navy', '#1E3A8A', 17),
--- Thắt Lưng (18)
-(52, 'Đen', '#000000', 18), (53, 'Nâu', '#92400E', 18);
+-- Insert product_info (thông tin biến thể: color, size, quantity)
+INSERT IGNORE INTO product_info (id, product_id, color_name, color_hex_code, size_name, quantity, image) VALUES
+-- Áo Thun Nam Basic (Product 1) - 4 colors x 4 sizes = 16 variants
+(1, 1, 'Trắng', '#FFFFFF', 'S', 25, null), (2, 1, 'Trắng', '#FFFFFF', 'M', 30, null), (3, 1, 'Trắng', '#FFFFFF', 'L', 28, null), (4, 1, 'Trắng', '#FFFFFF', 'XL', 20, null),
+(5, 1, 'Đen', '#000000', 'S', 22, null), (6, 1, 'Đen', '#000000', 'M', 35, null), (7, 1, 'Đen', '#000000', 'L', 32, null), (8, 1, 'Đen', '#000000', 'XL', 25, null),
+(9, 1, 'Xám', '#6B7280', 'S', 18, null), (10, 1, 'Xám', '#6B7280', 'M', 27, null), (11, 1, 'Xám', '#6B7280', 'L', 24, null), (12, 1, 'Xám', '#6B7280', 'XL', 20, null),
+(13, 1, 'Navy', '#1E3A8A', 'S', 20, null), (14, 1, 'Navy', '#1E3A8A', 'M', 28, null), (15, 1, 'Navy', '#1E3A8A', 'L', 26, null), (16, 1, 'Navy', '#1E3A8A', 'XL', 18, null),
 
--- Insert product sizes (kích cỡ sản phẩm)
-INSERT IGNORE INTO product_sizes (id, name, description, product_id) VALUES
--- Áo sizes (S, M, L, XL) - Products 1-6
-(1, 'S', 'Size S - Ngực 88cm, Vai 42cm', 1), (2, 'M', 'Size M - Ngực 92cm, Vai 44cm', 1), (3, 'L', 'Size L - Ngực 96cm, Vai 46cm', 1), (4, 'XL', 'Size XL - Ngực 100cm, Vai 48cm', 1),
-(5, 'S', 'Size S - Ngực 88cm, Vai 42cm', 2), (6, 'M', 'Size M - Ngực 92cm, Vai 44cm', 2), (7, 'L', 'Size L - Ngực 96cm, Vai 46cm', 2), (8, 'XL', 'Size XL - Ngực 100cm, Vai 48cm', 2),
-(9, 'S', 'Size S - Ngực 100cm, Vai 50cm', 3), (10, 'M', 'Size M - Ngực 104cm, Vai 52cm', 3), (11, 'L', 'Size L - Ngực 108cm, Vai 54cm', 3), (12, 'XL', 'Size XL - Ngực 112cm, Vai 56cm', 3),
-(13, 'S', 'Size S - Ngực 82cm, Vai 38cm', 4), (14, 'M', 'Size M - Ngực 86cm, Vai 40cm', 4), (15, 'L', 'Size L - Ngực 90cm, Vai 42cm', 4),
-(16, 'S', 'Size S - Ngực 86cm, Vai 40cm', 5), (17, 'M', 'Size M - Ngực 90cm, Vai 42cm', 5), (18, 'L', 'Size L - Ngực 94cm, Vai 44cm', 5),
-(19, 'S', 'Size S - Ngực 86cm, Vai 40cm', 6), (20, 'M', 'Size M - Ngực 90cm, Vai 42cm', 6), (21, 'L', 'Size L - Ngực 94cm, Vai 44cm', 6),
+-- Áo Sơ Mi Nam (Product 2) - 3 colors x 4 sizes = 12 variants
+(17, 2, 'Trắng', '#FFFFFF', 'S', 15, null), (18, 2, 'Trắng', '#FFFFFF', 'M', 22, null), (19, 2, 'Trắng', '#FFFFFF', 'L', 20, null), (20, 2, 'Trắng', '#FFFFFF', 'XL', 12, null),
+(21, 2, 'Xanh Nhạt', '#DBEAFE', 'S', 12, null), (22, 2, 'Xanh Nhạt', '#DBEAFE', 'M', 18, null), (23, 2, 'Xanh Nhạt', '#DBEAFE', 'L', 16, null), (24, 2, 'Xanh Nhạt', '#DBEAFE', 'XL', 10, null),
+(25, 2, 'Hồng Nhạt', '#FCE7F3', 'S', 10, null), (26, 2, 'Hồng Nhạt', '#FCE7F3', 'M', 15, null), (27, 2, 'Hồng Nhạt', '#FCE7F3', 'L', 14, null), (28, 2, 'Hồng Nhạt', '#FCE7F3', 'XL', 8, null),
 
--- Quần sizes (28-34) - Products 7-12
-(22, '28', 'Size 28 - Eo 71cm, Mông 86cm', 7), (23, '29', 'Size 29 - Eo 74cm, Mông 89cm', 7), (24, '30', 'Size 30 - Eo 76cm, Mông 91cm', 7), (25, '31', 'Size 31 - Eo 79cm, Mông 94cm', 7), (26, '32', 'Size 32 - Eo 81cm, Mông 96cm', 7), (27, '34', 'Size 34 - Eo 86cm, Mông 101cm', 7),
-(28, '28', 'Size 28 - Eo 71cm, Mông 86cm', 8), (29, '29', 'Size 29 - Eo 74cm, Mông 89cm', 8), (30, '30', 'Size 30 - Eo 76cm, Mông 91cm', 8), (31, '32', 'Size 32 - Eo 81cm, Mông 96cm', 8), (32, '34', 'Size 34 - Eo 86cm, Mông 101cm', 8),
-(33, 'S', 'Size S - Eo 66cm, Mông 86cm', 9), (34, 'M', 'Size M - Eo 71cm, Mông 91cm', 9), (35, 'L', 'Size L - Eo 76cm, Mông 96cm', 9), (36, 'XL', 'Size XL - Eo 81cm, Mông 101cm', 9),
-(37, '25', 'Size 25 - Eo 64cm, Mông 84cm', 10), (38, '26', 'Size 26 - Eo 66cm, Mông 86cm', 10), (39, '27', 'Size 27 - Eo 69cm, Mông 89cm', 10), (40, '28', 'Size 28 - Eo 71cm, Mông 91cm', 10), (41, '29', 'Size 29 - Eo 74cm, Mông 94cm', 10),
-(42, 'S', 'Size S - Eo 64cm, Dài 40cm', 11), (43, 'M', 'Size M - Eo 69cm, Dài 41cm', 11), (44, 'L', 'Size L - Eo 74cm, Dài 42cm', 11),
-(45, 'S', 'Size S - Eo 64cm, Dài 85cm', 12), (46, 'M', 'Size M - Eo 69cm, Dài 86cm', 12), (47, 'L', 'Size L - Eo 74cm, Dài 87cm', 12),
+-- Áo Hoodie Nam (Product 3) - 3 colors x 4 sizes = 12 variants
+(29, 3, 'Đen', '#000000', 'S', 12, null), (30, 3, 'Đen', '#000000', 'M', 18, null), (31, 3, 'Đen', '#000000', 'L', 20, null), (32, 3, 'Đen', '#000000', 'XL', 15, null),
+(33, 3, 'Xám', '#6B7280', 'S', 10, null), (34, 3, 'Xám', '#6B7280', 'M', 15, null), (35, 3, 'Xám', '#6B7280', 'L', 17, null), (36, 3, 'Xám', '#6B7280', 'XL', 12, null),
+(37, 3, 'Navy', '#1E3A8A', 'S', 8, null), (38, 3, 'Navy', '#1E3A8A', 'M', 12, null), (39, 3, 'Navy', '#1E3A8A', 'L', 14, null), (40, 3, 'Navy', '#1E3A8A', 'XL', 10, null),
 
--- Giày sizes (36-43) - Products 13-15
-(48, '39', 'Size 39 - 25cm', 13), (49, '40', 'Size 40 - 25.5cm', 13), (50, '41', 'Size 41 - 26cm', 13), (51, '42', 'Size 42 - 26.5cm', 13), (52, '43', 'Size 43 - 27cm', 13),
-(53, '36', 'Size 36 - 23cm', 14), (54, '37', 'Size 37 - 23.5cm', 14), (55, '38', 'Size 38 - 24cm', 14), (56, '39', 'Size 39 - 24.5cm', 14),
-(57, '36', 'Size 36 - 23cm', 15), (58, '37', 'Size 37 - 23.5cm', 15), (59, '38', 'Size 38 - 24cm', 15), (60, '39', 'Size 39 - 24.5cm', 15),
+-- Áo Thun Nữ Crop Top (Product 4) - 3 colors x 3 sizes = 9 variants
+(41, 4, 'Trắng', '#FFFFFF', 'S', 30, null), (42, 4, 'Trắng', '#FFFFFF', 'M', 35, null), (43, 4, 'Trắng', '#FFFFFF', 'L', 25, null),
+(44, 4, 'Hồng', '#EC4899', 'S', 28, null), (45, 4, 'Hồng', '#EC4899', 'M', 32, null), (46, 4, 'Hồng', '#EC4899', 'L', 22, null),
+(47, 4, 'Vàng', '#F59E0B', 'S', 24, null), (48, 4, 'Vàng', '#F59E0B', 'M', 28, null), (49, 4, 'Vàng', '#F59E0B', 'L', 20, null),
 
--- Phụ kiện - One size - Products 16-18
-(61, 'Free Size', 'Size tự do 38x32cm', 16),
-(62, 'Free Size', 'Size tự do 56-60cm', 17),
-(63, 'S', 'Size S 80-85cm', 18), (64, 'M', 'Size M 85-90cm', 18), (65, 'L', 'Size L 90-95cm', 18);
+-- Áo Blouse Nữ (Product 5) - 3 colors x 3 sizes = 9 variants
+(50, 5, 'Trắng', '#FFFFFF', 'S', 15, null), (51, 5, 'Trắng', '#FFFFFF', 'M', 20, null), (52, 5, 'Trắng', '#FFFFFF', 'L', 18, null),
+(53, 5, 'Be', '#F3E8FF', 'S', 12, null), (54, 5, 'Be', '#F3E8FF', 'M', 16, null), (55, 5, 'Be', '#F3E8FF', 'L', 14, null),
+(56, 5, 'Xanh Mint', '#A7F3D0', 'S', 10, null), (57, 5, 'Xanh Mint', '#A7F3D0', 'M', 14, null), (58, 5, 'Xanh Mint', '#A7F3D0', 'L', 12, null),
+
+-- Áo Khoác Blazer Nữ (Product 6) - 3 colors x 3 sizes = 9 variants
+(59, 6, 'Đen', '#000000', 'S', 10, null), (60, 6, 'Đen', '#000000', 'M', 14, null), (61, 6, 'Đen', '#000000', 'L', 12, null),
+(62, 6, 'Navy', '#1E3A8A', 'S', 8, null), (63, 6, 'Navy', '#1E3A8A', 'M', 12, null), (64, 6, 'Navy', '#1E3A8A', 'L', 10, null),
+(65, 6, 'Xám', '#6B7280', 'S', 7, null), (66, 6, 'Xám', '#6B7280', 'M', 10, null), (67, 6, 'Xám', '#6B7280', 'L', 9, null),
+
+-- Quần Jeans Nam (Product 7) - 3 colors x 6 sizes = 18 variants
+(68, 7, 'Xanh Đậm', '#1E40AF', '28', 12, null), (69, 7, 'Xanh Đậm', '#1E40AF', '29', 15, null), (70, 7, 'Xanh Đậm', '#1E40AF', '30', 18, null), (71, 7, 'Xanh Đậm', '#1E40AF', '31', 16, null), (72, 7, 'Xanh Đậm', '#1E40AF', '32', 14, null), (73, 7, 'Xanh Đậm', '#1E40AF', '34', 10, null),
+(74, 7, 'Xanh Nhạt', '#3B82F6', '28', 10, null), (75, 7, 'Xanh Nhạt', '#3B82F6', '29', 13, null), (76, 7, 'Xanh Nhạt', '#3B82F6', '30', 15, null), (77, 7, 'Xanh Nhạt', '#3B82F6', '31', 14, null), (78, 7, 'Xanh Nhạt', '#3B82F6', '32', 12, null), (79, 7, 'Xanh Nhạt', '#3B82F6', '34', 8, null),
+(80, 7, 'Đen', '#000000', '28', 11, null), (81, 7, 'Đen', '#000000', '29', 14, null), (82, 7, 'Đen', '#000000', '30', 16, null), (83, 7, 'Đen', '#000000', '31', 15, null), (84, 7, 'Đen', '#000000', '32', 13, null), (85, 7, 'Đen', '#000000', '34', 9, null),
+
+-- Quần Kaki Nam (Product 8) - 3 colors x 5 sizes = 15 variants
+(86, 8, 'Be', '#D97706', '28', 14, null), (87, 8, 'Be', '#D97706', '29', 16, null), (88, 8, 'Be', '#D97706', '30', 18, null), (89, 8, 'Be', '#D97706', '32', 15, null), (90, 8, 'Be', '#D97706', '34', 12, null),
+(91, 8, 'Xám', '#6B7280', '28', 12, null), (92, 8, 'Xám', '#6B7280', '29', 14, null), (93, 8, 'Xám', '#6B7280', '30', 16, null), (94, 8, 'Xám', '#6B7280', '32', 13, null), (95, 8, 'Xám', '#6B7280', '34', 10, null),
+(96, 8, 'Navy', '#1E3A8A', '28', 10, null), (97, 8, 'Navy', '#1E3A8A', '29', 12, null), (98, 8, 'Navy', '#1E3A8A', '30', 14, null), (99, 8, 'Navy', '#1E3A8A', '32', 11, null), (100, 8, 'Navy', '#1E3A8A', '34', 8, null),
+
+-- Quần Short Nam (Product 9) - 3 colors x 4 sizes = 12 variants
+(101, 9, 'Đen', '#000000', 'S', 20, null), (102, 9, 'Đen', '#000000', 'M', 25, null), (103, 9, 'Đen', '#000000', 'L', 22, null), (104, 9, 'Đen', '#000000', 'XL', 18, null),
+(105, 9, 'Xám', '#6B7280', 'S', 18, null), (106, 9, 'Xám', '#6B7280', 'M', 23, null), (107, 9, 'Xám', '#6B7280', 'L', 20, null), (108, 9, 'Xám', '#6B7280', 'XL', 16, null),
+(109, 9, 'Navy', '#1E3A8A', 'S', 16, null), (110, 9, 'Navy', '#1E3A8A', 'M', 21, null), (111, 9, 'Navy', '#1E3A8A', 'L', 18, null), (112, 9, 'Navy', '#1E3A8A', 'XL', 14, null),
+
+-- Quần Jeans Nữ (Product 10) - 3 colors x 5 sizes = 15 variants
+(113, 10, 'Xanh Đậm', '#1E40AF', '25', 15, null), (114, 10, 'Xanh Đậm', '#1E40AF', '26', 18, null), (115, 10, 'Xanh Đậm', '#1E40AF', '27', 20, null), (116, 10, 'Xanh Đậm', '#1E40AF', '28', 17, null), (117, 10, 'Xanh Đậm', '#1E40AF', '29', 14, null),
+(118, 10, 'Xanh Nhạt', '#3B82F6', '25', 13, null), (119, 10, 'Xanh Nhạt', '#3B82F6', '26', 16, null), (120, 10, 'Xanh Nhạt', '#3B82F6', '27', 18, null), (121, 10, 'Xanh Nhạt', '#3B82F6', '28', 15, null), (122, 10, 'Xanh Nhạt', '#3B82F6', '29', 12, null),
+(123, 10, 'Đen', '#000000', '25', 14, null), (124, 10, 'Đen', '#000000', '26', 17, null), (125, 10, 'Đen', '#000000', '27', 19, null), (126, 10, 'Đen', '#000000', '28', 16, null), (127, 10, 'Đen', '#000000', '29', 13, null),
+
+-- Chân Váy (Product 11) - 3 colors x 3 sizes = 9 variants
+(128, 11, 'Đen', '#000000', 'S', 22, null), (129, 11, 'Đen', '#000000', 'M', 28, null), (130, 11, 'Đen', '#000000', 'L', 24, null),
+(131, 11, 'Be', '#D97706', 'S', 18, null), (132, 11, 'Be', '#D97706', 'M', 24, null), (133, 11, 'Be', '#D97706', 'L', 20, null),
+(134, 11, 'Hồng', '#EC4899', 'S', 16, null), (135, 11, 'Hồng', '#EC4899', 'M', 22, null), (136, 11, 'Hồng', '#EC4899', 'L', 18, null),
+
+-- Quần Culottes (Product 12) - 3 colors x 3 sizes = 9 variants
+(137, 12, 'Đen', '#000000', 'S', 16, null), (138, 12, 'Đen', '#000000', 'M', 20, null), (139, 12, 'Đen', '#000000', 'L', 18, null),
+(140, 12, 'Trắng', '#FFFFFF', 'S', 14, null), (141, 12, 'Trắng', '#FFFFFF', 'M', 18, null), (142, 12, 'Trắng', '#FFFFFF', 'L', 16, null),
+(143, 12, 'Xám', '#6B7280', 'S', 12, null), (144, 12, 'Xám', '#6B7280', 'M', 16, null), (145, 12, 'Xám', '#6B7280', 'L', 14, null),
+
+-- Giày Sneaker Nam (Product 13) - 3 colors x 5 sizes = 15 variants
+(146, 13, 'Trắng', '#FFFFFF', '39', 8, null), (147, 13, 'Trắng', '#FFFFFF', '40', 10, null), (148, 13, 'Trắng', '#FFFFFF', '41', 12, null), (149, 13, 'Trắng', '#FFFFFF', '42', 10, null), (150, 13, 'Trắng', '#FFFFFF', '43', 7, null),
+(151, 13, 'Đen', '#000000', '39', 7, null), (152, 13, 'Đen', '#000000', '40', 9, null), (153, 13, 'Đen', '#000000', '41', 11, null), (154, 13, 'Đen', '#000000', '42', 9, null), (155, 13, 'Đen', '#000000', '43', 6, null),
+(156, 13, 'Xám', '#6B7280', '39', 6, null), (157, 13, 'Xám', '#6B7280', '40', 8, null), (158, 13, 'Xám', '#6B7280', '41', 10, null), (159, 13, 'Xám', '#6B7280', '42', 8, null), (160, 13, 'Xám', '#6B7280', '43', 5, null),
+
+-- Giày Boot Nữ (Product 14) - 2 colors x 4 sizes = 8 variants
+(161, 14, 'Đen', '#000000', '36', 12, null), (162, 14, 'Đen', '#000000', '37', 15, null), (163, 14, 'Đen', '#000000', '38', 14, null), (164, 14, 'Đen', '#000000', '39', 10, null),
+(165, 14, 'Nâu', '#92400E', '36', 10, null), (166, 14, 'Nâu', '#92400E', '37', 13, null), (167, 14, 'Nâu', '#92400E', '38', 12, null), (168, 14, 'Nâu', '#92400E', '39', 8, null),
+
+-- Sandal Nữ (Product 15) - 3 colors x 4 sizes = 12 variants
+(169, 15, 'Đen', '#000000', '36', 12, null), (170, 15, 'Đen', '#000000', '37', 15, null), (171, 15, 'Đen', '#000000', '38', 13, null), (172, 15, 'Đen', '#000000', '39', 10, null),
+(173, 15, 'Nâu', '#92400E', '36', 10, null), (174, 15, 'Nâu', '#92400E', '37', 13, null), (175, 15, 'Nâu', '#92400E', '38', 11, null), (176, 15, 'Nâu', '#92400E', '39', 8, null),
+(177, 15, 'Be', '#D97706', '36', 11, null), (178, 15, 'Be', '#D97706', '37', 14, null), (179, 15, 'Be', '#D97706', '38', 12, null), (180, 15, 'Be', '#D97706', '39', 9, null),
+
+-- Túi Tote (Product 16) - 3 colors x 1 size = 3 variants
+(181, 16, 'Be', '#D97706', 'Free Size', 45, null),
+(182, 16, 'Đen', '#000000', 'Free Size', 42, null),
+(183, 16, 'Navy', '#1E3A8A', 'Free Size', 38, null),
+
+-- Nón Snapback (Product 17) - 3 colors x 1 size = 3 variants
+(184, 17, 'Đen', '#000000', 'Free Size', 60, null),
+(185, 17, 'Xám', '#6B7280', 'Free Size', 55, null),
+(186, 17, 'Navy', '#1E3A8A', 'Free Size', 50, null),
+
+-- Thắt Lưng (Product 18) - 2 colors x 3 sizes = 6 variants
+(187, 18, 'Đen', '#000000', 'S', 15, null), (188, 18, 'Đen', '#000000', 'M', 18, null), (189, 18, 'Đen', '#000000', 'L', 16, null),
+(190, 18, 'Nâu', '#92400E', 'S', 13, null), (191, 18, 'Nâu', '#92400E', 'M', 16, null), (192, 18, 'Nâu', '#92400E', 'L', 14, null);
 
 -- Insert stock items (số lượng tồn kho)
 INSERT IGNORE INTO stock_items (id, stock_id, product_id, quantity) VALUES
@@ -183,18 +206,17 @@ INSERT IGNORE INTO stock_items (id, stock_id, product_id, quantity) VALUES
 
 -- Insert sample discounts (mã giảm giá)
 INSERT IGNORE INTO discounts (id, name, title, description, type, discount_amount, discount_percent, usage_count, max_usage, start_date, end_date, is_active) VALUES
-(1, 'WELCOME10', 'Ưu đãi khách mới', 'Giảm 10% cho khách hàng mới', 'PERCENT', 0, 10.0, 0, 1000, '2024-01-01', '2024-12-31', true),
-(2, 'SALE50K', 'Giảm 50K', 'Giảm 50k cho đơn hàng từ 500k', 'FIXED', 50000, 0.0, 0, 500, '2024-01-01', '2024-12-31', true),
-(3, 'SUMMER20', 'Khuyến mãi hè', 'Khuyến mãi hè - Giảm 20%', 'PERCENT', 0, 20.0, 0, 200, '2024-06-01', '2024-08-31', true),
-(4, 'FREESHIP', 'Miễn phí ship', 'Miễn phí vận chuyển', 'FIXED', 30000, 0.0, 0, 2000, '2024-01-01', '2024-12-31', true),
-(5, 'VIP15', 'Ưu đãi VIP', 'Ưu đãi VIP - Giảm 15%', 'PERCENT', 0, 15.0, 0, 100, '2024-01-01', '2024-12-31', true);
+(1, 'WELCOME10', 'Ưu đãi khách mới', 'Giảm 10% cho khách hàng mới', 'PERCENT', 0, 10.0, 0, 1000, '2025-01-01', '2025-12-31', true),
+(2, 'SALE50K', 'Giảm 50K', 'Giảm 50k cho đơn hàng từ 500k', 'FIXED', 50000, 0.0, 0, 500, '2025-01-01', '2025-12-31', true),
+(3, 'SUMMER20', 'Khuyến mãi hè', 'Khuyến mãi hè - Giảm 20%', 'PERCENT', 0, 20.0, 0, 200, '2025-06-01', '2025-08-31', true),
+(4, 'FREESHIP', 'Miễn phí ship', 'Miễn phí vận chuyển', 'FIXED', 30000, 0.0, 0, 2000, '2025-01-01', '2025-12-31', true),
+(5, 'VIP15', 'Ưu đãi VIP', 'Ưu đãi VIP - Giảm 15%', 'PERCENT', 0, 15.0, 0, 100, '2025-01-01', '2025-12-31', true);
 
 -- Reset AUTO_INCREMENT
 ALTER TABLE stocks AUTO_INCREMENT = 4;
 ALTER TABLE product_types AUTO_INCREMENT = 7;
 ALTER TABLE products AUTO_INCREMENT = 19;
-ALTER TABLE product_colors AUTO_INCREMENT = 54;
-ALTER TABLE product_sizes AUTO_INCREMENT = 66;
+ALTER TABLE product_info AUTO_INCREMENT = 193;
 ALTER TABLE stock_items AUTO_INCREMENT = 55;
 ALTER TABLE discounts AUTO_INCREMENT = 6;
 

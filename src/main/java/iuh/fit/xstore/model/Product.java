@@ -1,30 +1,25 @@
 package iuh.fit.xstore.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Copyright (c) 2025 by Tai.
- * All rights reserved.
- * This file is part of X-Store.
- */
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"colors", "sizes", "orderItems"})
-@EqualsAndHashCode(exclude = {"colors", "sizes", "orderItems"})
+@ToString(exclude = {"productInfos", "orderItems", "stockItems", "comments"})
+@EqualsAndHashCode(exclude = {"productInfos", "orderItems", "stockItems", "comments"})
 @Builder
-
 @Entity
 @Table(name = "products")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -33,8 +28,9 @@ public class Product {
     private String description;
     private String image;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_type_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ProductType type;
 
     private String brand;
@@ -44,18 +40,23 @@ public class Product {
     private double priceInStock;
     private double price;
 
-    // ✅ Một product có nhiều màu
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference // Điều khiển serialization hướng từ Product -> Color
-    private List<ProductColor> colors = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"product"})
+    @Builder.Default
+    private List<ProductInfo> productInfos = new ArrayList<>();
 
-    // ✅ Một product có nhiều size
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference // Điều khiển serialization hướng từ Product -> Size
-    private List<ProductSize> sizes = new ArrayList<>();
-
-    // ✅ OrderItem tham chiếu ngược về Product — không cần JSON
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<StockItem> stockItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"product", "author"})
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
 }

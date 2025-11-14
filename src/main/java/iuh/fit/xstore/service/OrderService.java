@@ -4,6 +4,7 @@ import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.Order;
 import iuh.fit.xstore.model.OrderItem;
+import iuh.fit.xstore.model.OrderStatus;
 import iuh.fit.xstore.repository.OrderItemRepository;
 import iuh.fit.xstore.repository.OrderRepository;
 import lombok.AllArgsConstructor;
@@ -24,8 +25,7 @@ public class OrderService {
     }
 
     public Order findOrderById(int id) {
-        return orderRepo.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        return orderRepo.findWithDetailsById(id);
     }
     @Transactional // <-- Thêm @Transactional để đảm bảo an toàn
     public Order createOrder(Order order) {
@@ -55,25 +55,14 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    public Order updateOrder(int id, Order order) {
+    public Order updateOrderStatus(int id, String status) {
         Order existed = findOrderById(id);
-        existed.setStatus(order.getStatus());
-        existed.setTotal(order.getTotal());
-
-        if (order.getOrderItems() != null) {
-            // Clear list cũ rồi add list mới để không lỗi orphan
-            existed.getOrderItems().clear();
-            order.getOrderItems().forEach(item -> item.setOrder(existed));
-            existed.getOrderItems().addAll(order.getOrderItems());
-
-            // Tính lại tổng tiền
-            double total = existed.getOrderItems()
-                    .stream()
-                    .mapToDouble(OrderItem::getSubTotal)
-                    .sum();
-            existed.setTotal(total);
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            existed.setStatus(orderStatus);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_INPUT);
         }
-
         return orderRepo.save(existed);
     }
 

@@ -48,5 +48,6 @@ public class Order {
     private String paymentMethod;      // CASH, CARD, MOMO, ZALOPAY
     private String shippingAddress;    // Địa chỉ giao hàng
     private String phoneNumber;        // Số điện thoại nhận hàng
+    private String recipientName;      // Tên người nhận hàng
     private String notes;              // Ghi chú đơn hàng
 }

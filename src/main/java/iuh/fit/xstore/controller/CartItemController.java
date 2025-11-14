@@ -94,7 +94,9 @@ public class CartItemController {
                     request.getCartId(),
                     request.getProductId(),
                     request.getStockId(),
-                    request.getQuantity()
+                    request.getQuantity(),
+                    request.getColor(),
+                    request.getSize()
             );
 
             ApiResponse<CartItem> response = new ApiResponse<>(

@@ -2,13 +2,11 @@ package iuh.fit.xstore.controller;
 
 import iuh.fit.xstore.dto.request.ProductFilterRequest;
 import iuh.fit.xstore.dto.request.ProductCreateRequest;
-import iuh.fit.xstore.dto.request.ProductColorDTO;
-import iuh.fit.xstore.dto.request.ProductSizeDTO;
+import iuh.fit.xstore.dto.request.ProductUpdateRequest;
 import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.SuccessCode;
 import iuh.fit.xstore.model.Product;
-import iuh.fit.xstore.model.ProductColor;
-import iuh.fit.xstore.model.ProductSize;
+import iuh.fit.xstore.model.ProductInfo;
 import iuh.fit.xstore.model.ProductType;
 import iuh.fit.xstore.service.ProductService;
 import iuh.fit.xstore.service.ProductTypeService;
@@ -69,6 +67,7 @@ public class ProductController {
     /**
      * ✅ Tạo sản phẩm mới với file ảnh (multipart/form-data)
      * POST /api/products/upload
+     * NOTE: ProductInfo (colors, sizes, quantities) sẽ được quản lý riêng qua ProductInfoController
      */
     @PostMapping("/upload")
     public ApiResponse<Product> createProductWithImage(
@@ -79,8 +78,6 @@ public class ProductController {
             @RequestParam Double price,
             @RequestParam Double priceInStock,
             @RequestParam int typeId,
-            @RequestParam String colors,      // JSON string: [{"name":"Red","hexCode":"#FF0000"},...]
-            @RequestParam String sizes,       // JSON string: [{"name":"S","description":"Small"},...]
             @RequestParam(required = false) MultipartFile image
     ) throws Exception {
         System.out.println("📥 [CREATE MULTIPART] Received product data:");
@@ -101,7 +98,7 @@ public class ProductController {
         Product product = new Product();
         product.setName(name);
         product.setDescription(description);
-        product.setImage(imagePath);  // Lưu đường dẫn ảnh
+        product.setImage(imagePath);
         product.setBrand(brand);
         product.setFabric(fabric);
         product.setPrice(price);
@@ -113,45 +110,7 @@ public class ProductController {
             product.setType(type);
         }
 
-        // ✅ Parse colors JSON string thành ProductColor entities
-        List<ProductColor> colorList = new ArrayList<>();
-        try {
-            List<ProductColorDTO> colorDtos = objectMapper.readValue(
-                    colors,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ProductColorDTO.class)
-            );
-            for (ProductColorDTO colorDto : colorDtos) {
-                ProductColor color = new ProductColor();
-                color.setName(colorDto.getName());
-                color.setHexCode(colorDto.getHexCode());
-                colorList.add(color);
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error parsing colors: " + e.getMessage());
-            throw new RuntimeException("Invalid colors format");
-        }
-        product.setColors(colorList);
-
-        // ✅ Parse sizes JSON string thành ProductSize entities
-        List<ProductSize> sizeList = new ArrayList<>();
-        try {
-            List<ProductSizeDTO> sizeDtos = objectMapper.readValue(
-                    sizes,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ProductSizeDTO.class)
-            );
-            for (ProductSizeDTO sizeDto : sizeDtos) {
-                ProductSize size = new ProductSize();
-                size.setName(sizeDto.getName());
-                size.setDescription(sizeDto.getDescription());
-                sizeList.add(size);
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error parsing sizes: " + e.getMessage());
-            throw new RuntimeException("Invalid sizes format");
-        }
-        product.setSizes(sizeList);
-
-        System.out.println("✅ Creating product with " + colorList.size() + " colors and " + sizeList.size() + " sizes");
+        // ProductInfo (colors, sizes, quantities) sẽ được thêm sau qua ProductInfoController
         Product createdProduct = productService.createProduct(product);
         System.out.println("✅ Product created successfully: ID " + createdProduct.getId());
         return new ApiResponse<>(SuccessCode.PRODUCT_CREATED, createdProduct);
@@ -160,6 +119,7 @@ public class ProductController {
     /**
      * ✅ Cập nhật sản phẩm với file ảnh mới (multipart/form-data)
      * PUT /api/products/{id}/upload
+     * NOTE: ProductInfo (colors, sizes, quantities) sẽ được quản lý riêng qua ProductInfoController
      */
     @PutMapping("/{id}/upload")
     public ApiResponse<Product> updateProductWithImage(
@@ -171,8 +131,6 @@ public class ProductController {
             @RequestParam Double price,
             @RequestParam Double priceInStock,
             @RequestParam int typeId,
-            @RequestParam String colors,      // JSON string
-            @RequestParam String sizes,       // JSON string
             @RequestParam(required = false) MultipartFile image
     ) throws Exception {
         System.out.println("📥 [UPDATE MULTIPART] Updating product ID: " + id);
@@ -207,45 +165,7 @@ public class ProductController {
             product.setType(type);
         }
 
-        // ✅ Parse colors JSON string thành ProductColor entities
-        List<ProductColor> colorList = new ArrayList<>();
-        try {
-            List<ProductColorDTO> colorDtos = objectMapper.readValue(
-                    colors,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ProductColorDTO.class)
-            );
-            for (ProductColorDTO colorDto : colorDtos) {
-                ProductColor color = new ProductColor();
-                color.setName(colorDto.getName());
-                color.setHexCode(colorDto.getHexCode());
-                colorList.add(color);
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error parsing colors: " + e.getMessage());
-            throw new RuntimeException("Invalid colors format");
-        }
-        product.setColors(colorList);
-
-        // ✅ Parse sizes JSON string thành ProductSize entities
-        List<ProductSize> sizeList = new ArrayList<>();
-        try {
-            List<ProductSizeDTO> sizeDtos = objectMapper.readValue(
-                    sizes,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ProductSizeDTO.class)
-            );
-            for (ProductSizeDTO sizeDto : sizeDtos) {
-                ProductSize size = new ProductSize();
-                size.setName(sizeDto.getName());
-                size.setDescription(sizeDto.getDescription());
-                sizeList.add(size);
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error parsing sizes: " + e.getMessage());
-            throw new RuntimeException("Invalid sizes format");
-        }
-        product.setSizes(sizeList);
-
-        System.out.println("✅ Updating product with " + colorList.size() + " colors and " + sizeList.size() + " sizes");
+        // ProductInfo (colors, sizes, quantities) sẽ được cập nhật riêng qua ProductInfoController
         Product updatedProduct = productService.updateProduct(product);
         System.out.println("✅ Product updated successfully");
         return new ApiResponse<>(SuccessCode.PRODUCT_UPDATED, updatedProduct);
@@ -273,12 +193,6 @@ public class ProductController {
 
     @PostMapping
     public ApiResponse<Product> createProduct(@RequestBody ProductCreateRequest request) {
-        System.out.println("📥 Received product data:");
-        System.out.println("   Name: " + request.getName());
-        System.out.println("   Colors: " + request.getColors().size());
-        System.out.println("   Sizes: " + request.getSizes().size());
-        
-        // ✅ Chuyển DTO thành Product entity
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -287,48 +201,34 @@ public class ProductController {
         product.setFabric(request.getFabric());
         product.setPrice(request.getPrice());
         product.setPriceInStock(request.getPriceInStock());
-        
-        // ✅ Lấy ProductType từ ID
+
         if (request.getTypeId() > 0) {
-            ProductType type = productTypeService.findById(request.getTypeId());
-            product.setType(type);
+            product.setType(productTypeService.findById(request.getTypeId()));
         }
-        
-        // ✅ Chuyển colors DTO thành ProductColor entity
-        List<ProductColor> colors = new ArrayList<>();
-        for (ProductColorDTO colorDto : request.getColors()) {
-            ProductColor color = new ProductColor();
-            color.setName(colorDto.getName());
-            color.setHexCode(colorDto.getHexCode());
-            colors.add(color);
+
+        // --- Thêm phần ProductInfos ---
+        if (request.getProductInfos() != null && !request.getProductInfos().isEmpty()) {
+            List<ProductInfo> infos = request.getProductInfos().stream().map(infoReq -> {
+                ProductInfo info = new ProductInfo();
+                info.setColorName(infoReq.getColorName());
+                info.setColorHexCode(infoReq.getColorHexCode());
+                info.setSizeName(infoReq.getSizeName());
+                info.setQuantity(infoReq.getQuantity());
+                info.setImage(infoReq.getImage());
+                info.setProduct(product); // quan trọng: gán product để cascade lưu
+                return info;
+            }).toList();
+            product.setProductInfos(infos);
         }
-        product.setColors(colors);
-        
-        // ✅ Chuyển sizes DTO thành ProductSize entity
-        List<ProductSize> sizes = new ArrayList<>();
-        for (ProductSizeDTO sizeDto : request.getSizes()) {
-            ProductSize size = new ProductSize();
-            size.setName(sizeDto.getName());
-            size.setDescription(sizeDto.getDescription());
-            sizes.add(size);
-        }
-        product.setSizes(sizes);
-        
+
         Product createdProduct = productService.createProduct(product);
         return new ApiResponse<>(SuccessCode.PRODUCT_CREATED, createdProduct);
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Product> updateProduct(@PathVariable int id, @RequestBody ProductCreateRequest request) {
-        System.out.println("📥 Updating product ID: " + id);
-        System.out.println("   Request: " + request);
-        System.out.println("   Name: " + request.getName());
-        System.out.println("   TypeId: " + request.getTypeId());
-        System.out.println("   Colors: " + (request.getColors() != null ? request.getColors().size() : 0));
-        System.out.println("   Sizes: " + (request.getSizes() != null ? request.getSizes().size() : 0));
-        
+    public ApiResponse<Product> updateProduct(@PathVariable int id, @RequestBody ProductUpdateRequest request) {
+
         try {
-            // ✅ Chuyển DTO thành Product entity
             Product product = new Product();
             product.setId(id);
             product.setName(request.getName());
@@ -338,48 +238,29 @@ public class ProductController {
             product.setFabric(request.getFabric());
             product.setPrice(request.getPrice());
             product.setPriceInStock(request.getPriceInStock());
-            
-            // ✅ Lấy ProductType từ ID
+
             if (request.getTypeId() > 0) {
                 ProductType type = productTypeService.findById(request.getTypeId());
                 product.setType(type);
             }
-            
-            // ✅ Chuyển colors DTO thành ProductColor entity
-            List<ProductColor> colors = new ArrayList<>();
-            if (request.getColors() != null) {
-                for (ProductColorDTO colorDto : request.getColors()) {
-                    ProductColor color = new ProductColor();
-                    color.setName(colorDto.getName());
-                    color.setHexCode(colorDto.getHexCode());
-                    colors.add(color);
-                }
+
+            if (request.getProductInfos() != null && !request.getProductInfos().isEmpty()) {
+                request.getProductInfos().forEach(info -> info.setProduct(product)); // quan trọng để cascade lưu
+                product.setProductInfos(request.getProductInfos());
             }
-            product.setColors(colors);
-            
-            // ✅ Chuyển sizes DTO thành ProductSize entity
-            List<ProductSize> sizes = new ArrayList<>();
-            if (request.getSizes() != null) {
-                for (ProductSizeDTO sizeDto : request.getSizes()) {
-                    ProductSize size = new ProductSize();
-                    size.setName(sizeDto.getName());
-                    size.setDescription(sizeDto.getDescription());
-                    sizes.add(size);
-                }
-            }
-            product.setSizes(sizes);
-            
-            System.out.println("✅ Product entity prepared: " + product.getName());
-            
+
+            System.out.println("Product entity prepared: " + product.getName());
+
             Product updatedProduct = productService.updateProduct(product);
-            System.out.println("✅ Product updated successfully");
+            System.out.println("Product updated successfully");
             return new ApiResponse<>(SuccessCode.PRODUCT_UPDATED, updatedProduct);
         } catch (Exception e) {
-            System.err.println("❌ Error updating product: " + e.getMessage());
+            System.err.println("Error updating product: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
     }
+
 
     @DeleteMapping("/{id}")
     public ApiResponse<Integer> deleteProduct(@PathVariable int id) {
@@ -399,61 +280,8 @@ public class ProductController {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, stockItems);
     }
 
-    @GetMapping("/{id}/colors")
-    public ApiResponse<List<ProductColor>> getProductColors(@PathVariable int id) {
-        List<ProductColor> colors = productService.getProductColors(id);
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, colors);
-    }
-
-    @GetMapping("/{id}/sizes")
-    public ApiResponse<List<ProductSize>> getProductSizes(@PathVariable int id) {
-        List<ProductSize> sizes = productService.getProductSizes(id);
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, sizes);
-    }
-
-    /**
-     * ✅ Xoá một color của sản phẩm
-     * DELETE /api/products/{productId}/colors/{colorId}
-     */
-    @DeleteMapping("/{productId}/colors/{colorId}")
-    public ApiResponse<String> deleteProductColor(@PathVariable int productId, @PathVariable int colorId) {
-        System.out.println("🗑️ Deleting color " + colorId + " from product " + productId);
-        productService.deleteProductColor(colorId);
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, "Color deleted successfully");
-    }
-
-    /**
-     * ✅ Xoá một size của sản phẩm
-     * DELETE /api/products/{productId}/sizes/{sizeId}
-     */
-    @DeleteMapping("/{productId}/sizes/{sizeId}")
-    public ApiResponse<String> deleteProductSize(@PathVariable int productId, @PathVariable int sizeId) {
-        System.out.println("🗑️ Deleting size " + sizeId + " from product " + productId);
-        productService.deleteProductSize(sizeId);
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, "Size deleted successfully");
-    }
-
-    /**
-     * ✅ Xoá tất cả colors của sản phẩm
-     * DELETE /api/products/{productId}/colors
-     */
-    @DeleteMapping("/{productId}/colors")
-    public ApiResponse<String> deleteAllProductColors(@PathVariable int productId) {
-        System.out.println("🗑️ Deleting all colors from product " + productId);
-        productService.deleteAllProductColors(productId);
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, "All colors deleted successfully");
-    }
-
-    /**
-     * ✅ Xoá tất cả sizes của sản phẩm
-     * DELETE /api/products/{productId}/sizes
-     */
-    @DeleteMapping("/{productId}/sizes")
-    public ApiResponse<String> deleteAllProductSizes(@PathVariable int productId) {
-        System.out.println("🗑️ Deleting all sizes from product " + productId);
-        productService.deleteAllProductSizes(productId);
-        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, "All sizes deleted successfully");
-    }
+    // Colors và Sizes giờ được quản lý qua ProductInfoController
+    // Xem ProductInfoController để biết thêm chi tiết
 
     /**
      * Filter products with advanced criteria

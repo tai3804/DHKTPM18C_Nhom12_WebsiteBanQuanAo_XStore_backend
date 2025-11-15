@@ -4,7 +4,7 @@ import iuh.fit.xstore.dto.request.CommentCreateRequest;
 import iuh.fit.xstore.dto.request.CommentUpdateRequest;
 import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.model.Comment;
-import iuh.fit.xstore.services.CommentService;
+import iuh.fit.xstore.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

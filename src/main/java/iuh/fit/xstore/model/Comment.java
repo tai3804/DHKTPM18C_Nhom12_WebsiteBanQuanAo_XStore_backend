@@ -27,7 +27,10 @@ public class Comment {
     @JsonIgnoreProperties({"productInfos", "comments", "orderItems", "stockItems"})
     private Product product;
 
-    private String author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    @JsonIgnoreProperties({"comments", "shipInfos", "cart", "account", "address", "role", "rawPassword", "point", "userType", "isPhoneVerified", "dob", "email", "phone", "avatar"})
+    private User author;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;

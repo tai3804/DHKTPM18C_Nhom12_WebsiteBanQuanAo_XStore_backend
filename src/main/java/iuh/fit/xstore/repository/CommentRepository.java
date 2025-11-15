@@ -21,10 +21,10 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findByProductIdOrderByCommentAtDesc(@Param("productId") int productId);
 
     /**
-     * Lấy tất cả comments của một author (author được lưu dưới dạng String), sắp xếp theo thời gian mới nhất
+     * Lấy tất cả comments của một author, sắp xếp theo thời gian mới nhất
      */
-    @Query("SELECT c FROM Comment c WHERE c.author = :author ORDER BY c.commentAt DESC")
-    List<Comment> findByAuthorOrderByCommentAtDesc(@Param("author") String author);
+    @Query("SELECT c FROM Comment c WHERE c.author.id = :authorId ORDER BY c.commentAt DESC")
+    List<Comment> findByAuthorIdOrderByCommentAtDesc(@Param("authorId") int authorId);
 
     /**
      * Đếm số lượng comments của một sản phẩm

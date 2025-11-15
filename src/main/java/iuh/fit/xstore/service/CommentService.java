@@ -1,4 +1,4 @@
-package iuh.fit.xstore.services;
+package iuh.fit.xstore.service;
 
 import iuh.fit.xstore.model.Comment;
 import iuh.fit.xstore.model.Product;
@@ -42,17 +42,10 @@ public class CommentService {
     }
 
     /**
-     * Lấy tất cả comments của một author (author lưu dưới dạng String)
-     */
-    public List<Comment> findByAuthor(String author) {
-        return commentRepository.findByAuthorOrderByCommentAtDesc(author);
-    }
-
-    /**
-     * Convenience: Lấy tất cả comments của một author bằng authorId (int)
+     * Lấy tất cả comments của một author bằng authorId (int)
      */
     public List<Comment> findByAuthorId(int authorId) {
-        return commentRepository.findByAuthorOrderByCommentAtDesc(String.valueOf(authorId));
+        return commentRepository.findByAuthorIdOrderByCommentAtDesc(authorId);
     }
 
     /**
@@ -71,10 +64,11 @@ public class CommentService {
 
         // Tạo mock Product và User objects (thực tế sẽ lấy từ database)
         Product product = Product.builder().id(productId).build();
+        User author = User.builder().id(authorId).build();
 
         Comment comment = Comment.builder()
             .product(product)
-            .author(String.valueOf(authorId))
+            .author(author)
                 .text(text.trim())
                 .image(image)
                 .rate(rate)

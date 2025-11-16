@@ -220,3 +220,27 @@ ALTER TABLE product_info AUTO_INCREMENT = 193;
 ALTER TABLE stock_items AUTO_INCREMENT = 55;
 ALTER TABLE discounts AUTO_INCREMENT = 6;
 
+-- Create chat_rooms table
+CREATE TABLE IF NOT EXISTS chat_rooms (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
+    session_id VARCHAR(255),
+    name VARCHAR(255) NOT NULL
+);
+
+-- Create chats table for customer support chat system
+CREATE TABLE IF NOT EXISTS chats (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    is_read BOOLEAN DEFAULT FALSE,
+    message TEXT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    sender BIGINT NOT NULL, -- 0 for admin, userId for user
+    chat_room_id BIGINT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id)
+);
+
+-- Reset AUTO_INCREMENT
+ALTER TABLE chat_rooms AUTO_INCREMENT = 1;
+ALTER TABLE chats AUTO_INCREMENT = 1;
+

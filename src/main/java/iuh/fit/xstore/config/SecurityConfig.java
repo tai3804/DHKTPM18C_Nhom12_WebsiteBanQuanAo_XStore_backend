@@ -1,5 +1,6 @@
 package iuh.fit.xstore.config;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,8 @@ public class SecurityConfig {
         "/api/carts/**",
         "/api/cart-items/**",
         "/api/discounts/**","/api/comments/product/*",
+            "/api/ai/**",
+        "/api/chat/user",
         "/uploads/**"
     };
 

@@ -1,2 +1,14 @@
 jwt:
-  key: 982759fe9032c9794bacef867d65dc1084b29c6685176f77ee9d7765d0a1ad3d
+  key: ${SECRECT_KEY}
+
+spring:
+  application:
+    name: XStore
+  ai:
+    openai:
+      api-key: ${GEMINI_API_KEY}
+      chat:
+        base-url: https://generativelanguage.googleapis.com/
+        completions-path: /v1beta/openai/chat/completions
+        options:
+          model: gemini-2.0-flash

@@ -267,7 +267,14 @@ CREATE TABLE IF NOT EXISTS chats (
     FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id)
 );
 
--- Reset AUTO_INCREMENT
-ALTER TABLE chat_rooms AUTO_INCREMENT = 1;
-ALTER TABLE chats AUTO_INCREMENT = 1;
+-- Insert sample product_sales (giảm giá sản phẩm)
+INSERT IGNORE INTO product_sales (product_id, discount_percent, discounted_price, original_price, start_date, end_date) VALUES
+(1, 20, 143800, 179000, '2025-01-01', '2025-12-31'),
+(2, 15, 339150, 399000, '2025-01-01', '2025-12-31'),
+(3, 25, 374250, 499000, '2025-01-01', '2025-12-31'),
+(4, 10, 161100, 179000, '2025-01-01', '2025-12-31'),
+(5, 30, 242100, 346000, '2025-01-01', '2025-12-31');
+
+-- Update is_sale for products with sales
+UPDATE products SET is_sale = true WHERE id IN (1,2,3,4,5);
 

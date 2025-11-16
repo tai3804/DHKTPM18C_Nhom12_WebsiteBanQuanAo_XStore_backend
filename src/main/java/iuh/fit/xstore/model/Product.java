@@ -40,6 +40,9 @@ public class Product {
     private double priceInStock;
     private double price;
 
+    @Column(name = "is_sale")
+    private boolean isSale;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"product"})
     @Builder.Default
@@ -59,4 +62,8 @@ public class Product {
     @JsonIgnoreProperties({"product", "author"})
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"product"})
+    private ProductSales productSales;
 }

@@ -55,6 +55,11 @@ public enum SuccessCode {
     DISCOUNT_UPDATED(200, "Discount updated successfully"),
     DISCOUNT_DELETED(200, "Discount deleted successfully"),
 
+    // === Product Sales Success ===
+    PRODUCT_SALES_CREATED(201, "Product sales created successfully"),
+    PRODUCT_SALES_UPDATED(200, "Product sales updated successfully"),
+    PRODUCT_SALES_DELETED(200, "Product sales deleted successfully"),
+
     //=== stock ===
     STOCK_CREATED(201, "Stock created successfully"),
     STOCK_UPDATED(200, "Stock updated successfully"),

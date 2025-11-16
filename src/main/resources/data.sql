@@ -11,9 +11,36 @@ DELETE FROM products WHERE id > 0;
 DELETE FROM product_types WHERE id > 0;
 DELETE FROM stocks WHERE id > 0;
 DELETE FROM discounts WHERE id > 0;
+-- Note: Không xóa comments và comment_attachments để giữ dữ liệu user
 
 -- Bật lại foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Create comment_attachments table
+CREATE TABLE IF NOT EXISTS comment_attachments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    comment_id BIGINT NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    file_type VARCHAR(10) NOT NULL DEFAULT 'image',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
+);
+
+-- Add author_name column to comments table if it doesn't exist
+ALTER TABLE comments ADD COLUMN IF NOT EXISTS author_name VARCHAR(255) NOT NULL DEFAULT 'Unknown';
+
+-- Create comments table if it doesn't exist
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    author_id BIGINT NOT NULL,
+    author_name VARCHAR(255) NOT NULL,
+    text TEXT NOT NULL,
+    comment_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    rate INT NOT NULL CHECK (rate >= 1 AND rate <= 5),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
 
 -- Insert sample stocks (kho hàng)
 INSERT IGNORE INTO stocks (id, name, phone, email, address_id) VALUES

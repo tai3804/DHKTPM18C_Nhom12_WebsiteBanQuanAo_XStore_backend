@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,10 +14,11 @@ import lombok.NoArgsConstructor;
 public class CommentCreateRequest {
     private int productId; // ID sản phẩm cần comment
     private int authorId; // ID user comment
+    private String authorName; // Tên người comment
 
     private String text;
 
-    private String image; // optional
+    private List<String> imageUrls; // Danh sách URL ảnh/video
 
     private int rate; // 1-5
 }

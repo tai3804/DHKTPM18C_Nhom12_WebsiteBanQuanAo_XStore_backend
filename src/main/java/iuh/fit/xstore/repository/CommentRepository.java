@@ -17,13 +17,13 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     /**
      * Lấy tất cả comments của một sản phẩm, sắp xếp theo thời gian mới nhất
      */
-    @Query("SELECT c FROM Comment c WHERE c.product.id = :productId ORDER BY c.commentAt DESC")
+    @Query("SELECT c FROM Comment c LEFT JOIN FETCH c.attachments WHERE c.product.id = :productId ORDER BY c.commentAt DESC")
     List<Comment> findByProductIdOrderByCommentAtDesc(@Param("productId") int productId);
 
     /**
      * Lấy tất cả comments của một author, sắp xếp theo thời gian mới nhất
      */
-    @Query("SELECT c FROM Comment c WHERE c.author.id = :authorId ORDER BY c.commentAt DESC")
+    @Query("SELECT c FROM Comment c LEFT JOIN FETCH c.attachments WHERE c.author.id = :authorId ORDER BY c.commentAt DESC")
     List<Comment> findByAuthorIdOrderByCommentAtDesc(@Param("authorId") int authorId);
 
     /**

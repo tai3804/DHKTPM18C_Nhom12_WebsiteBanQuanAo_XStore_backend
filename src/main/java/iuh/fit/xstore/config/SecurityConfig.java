@@ -25,18 +25,19 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] PUBLIC = {
-        "/", 
-        "/api/auth/**", 
-        "/api/otp/**", 
-        "/api/products/**", 
-        "/api/product-types/**",
-        "/api/file/**",
-        "/api/carts/**",
-        "/api/cart-items/**",
-        "/api/discounts/**","/api/comments/product/*",
+            "/uploads/**",
+            "/comments/**",
+            "/",
+            "/api/auth/**",
+            "/api/otp/**",
+            "/api/products/**",
+            "/api/product-types/**",
+            "/api/file/**",
+            "/api/carts/**",
+            "/api/cart-items/**",
+            "/api/discounts/**","/api/comments/**",
             "/api/ai/**",
-        "/api/chat/user",
-        "/uploads/**"
+            "/api/chat/user",
     };
 
     @Value("${jwt.key}")

@@ -10,11 +10,21 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/file")
 public class UploadController {
     private final String UPLOAD_DIR = "uploads";
+    private final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList(
+        "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"
+    );
+    private final List<String> ALLOWED_VIDEO_TYPES = Arrays.asList(
+        "video/mp4", "video/avi", "video/mov", "video/wmv", "video/flv", "video/webm"
+    );
 
     @PostMapping("/upload")
     public ApiResponse<?> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -22,18 +32,36 @@ public class UploadController {
             return new ApiResponse<>(ErrorCode.FILE_EMPTY);
         }
 
+        // Kiểm tra kích thước file
+        if (file.getSize() > MAX_FILE_SIZE) {
+            return new ApiResponse<>(400, "File quá lớn. Kích thước tối đa là 10MB", null);
+        }
+
+        // Kiểm tra loại file
+        String contentType = file.getContentType();
+        if (!ALLOWED_IMAGE_TYPES.contains(contentType) && !ALLOWED_VIDEO_TYPES.contains(contentType)) {
+            return new ApiResponse<>(400, "Loại file không được hỗ trợ. Chỉ chấp nhận ảnh và video", null);
+        }
+
         try  {
-            File dir = new File(UPLOAD_DIR);
+            // Tạo thư mục comments nếu chưa có
+            File dir = new File(UPLOAD_DIR + "/comments");
             if (!dir.exists()) dir.mkdirs();
 
+            // Tạo tên file duy nhất
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String uniqueFilename = UUID.randomUUID().toString() + extension;
+
             // Tạo đường dẫn file
-            Path filePath = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+            Path filePath = Paths.get(UPLOAD_DIR + "/comments", uniqueFilename);
 
             // Lưu file
             Files.write(filePath, file.getBytes());
 
-            System.out.println(file);
-            return new ApiResponse<>(SuccessCode.FILE_UPLAOD_SUCCESSFULLY, file.getName());
+            // Trả về đường dẫn tương đối
+            String fileUrl = "/comments/" + uniqueFilename;
+            return new ApiResponse<>(SuccessCode.FILE_UPLAOD_SUCCESSFULLY, fileUrl);
 
         } catch (Exception e) {
             return new ApiResponse<>(ErrorCode.FILE_UPLOAD_FAILED);

@@ -9,5 +9,5 @@ import lombok.*;
 public class CommentUpdateRequest {
     private String text;
     private int rate;
-    private String image; // optional
+    // Note: Attachments cannot be updated after creation
 }

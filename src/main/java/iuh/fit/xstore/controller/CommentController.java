@@ -8,7 +8,9 @@ import iuh.fit.xstore.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -60,14 +62,81 @@ public class CommentController {
         Comment comment = commentService.create(
                 request.getProductId(),
                 request.getAuthorId(),
+                request.getAuthorName(),
                 request.getText(),
-                request.getImage(),
-                request.getRate()
+                request.getRate(),
+                request.getImageUrls()
         );
 
         return ResponseEntity.status(201).body(
                 new ApiResponse<>(201, "Tạo bình luận thành công", comment)
         );
+    }
+
+    // CREATE comment with multiple files upload
+    @PostMapping("/with-files")
+    public ResponseEntity<?> createCommentWithFiles(
+            @RequestParam("productId") int productId,
+            @RequestParam("authorId") int authorId,
+            @RequestParam("authorName") String authorName,
+            @RequestParam("text") String text,
+            @RequestParam("rate") int rate,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+
+        List<String> imageUrls = new ArrayList<>();
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    // Validate file size (10MB)
+                    if (file.getSize() > 10 * 1024 * 1024) {
+                        return ResponseEntity.badRequest().body(
+                            new ApiResponse<>(400, "File quá lớn. Kích thước tối đa là 10MB", null)
+                        );
+                    }
+
+                    // Validate file type
+                    String contentType = file.getContentType();
+                    if (contentType == null ||
+                        (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
+                        return ResponseEntity.badRequest().body(
+                            new ApiResponse<>(400, "Loại file không được hỗ trợ. Chỉ chấp nhận ảnh và video", null)
+                        );
+                    }
+
+                    try {
+                        // Save file and get URL
+                        String imageUrl = saveCommentFile(file);
+                        imageUrls.add(imageUrl);
+                    } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(
+                            new ApiResponse<>(400, "Lỗi khi lưu file: " + e.getMessage(), null)
+                        );
+                    }
+                }
+            }
+        }
+
+        Comment comment = commentService.create(productId, authorId, authorName, text, rate, imageUrls);
+
+        return ResponseEntity.status(201).body(
+                new ApiResponse<>(201, "Tạo bình luận thành công", comment)
+        );
+    }
+
+    private String saveCommentFile(MultipartFile file) throws Exception {
+        java.io.File dir = new java.io.File("uploads/comments");
+        if (!dir.exists()) dir.mkdirs();
+
+        // Generate unique filename
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String uniqueFilename = java.util.UUID.randomUUID().toString() + extension;
+
+        // Save file
+        java.nio.file.Path filePath = java.nio.file.Paths.get("uploads/comments", uniqueFilename);
+        java.nio.file.Files.write(filePath, file.getBytes());
+
+        return "/comments/" + uniqueFilename;
     }
 
     // UPDATE comment
@@ -79,7 +148,6 @@ public class CommentController {
         Comment updated = commentService.update(
                 id,
                 request.getText(),
-                request.getImage(),
                 request.getRate()
         );
 

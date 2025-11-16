@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -13,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@ToString(exclude = {"product", "author"})
-@EqualsAndHashCode(exclude = {"product", "author"})
+@ToString(exclude = {"product", "author", "attachments"})
+@EqualsAndHashCode(exclude = {"product", "author", "attachments"})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Comment {
 
@@ -32,16 +33,21 @@ public class Comment {
     @JsonIgnoreProperties({"comments", "shipInfos", "cart", "account", "address", "role", "rawPassword", "point", "userType", "isPhoneVerified", "dob", "email", "phone", "avatar"})
     private User author;
 
+    @Column(name = "author_name", nullable = false)
+    private String authorName;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
-
-    private String image;
 
     @Column(name = "comment_at", nullable = false)
     private LocalDateTime commentAt;
 
     @Column(nullable = false)
     private int rate;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"comment"})
+    private List<CommentAttachment> attachments;
 
     @PrePersist
     public void prePersist() {

@@ -4,6 +4,7 @@ import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.dto.response.SuccessCode;
+import iuh.fit.xstore.model.User; // Import the User model
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.service.MailService;
 import iuh.fit.xstore.service.OtpMailService;
@@ -31,16 +32,28 @@ public class OtpController {
         return new ApiResponse<>(SuccessCode.OTP_SEND_SUCCESSFULLY, cleanEmail);
     }
 
-    // API NÀY DÙNG CHO QUÊN MK (CÓ CHECK EMAIL)
+    // API NÀY DÙNG CHO QUÊN MK (CÓ CHECK EMAIL/USERNAME)
     @PostMapping("/reset-password")
-    public ApiResponse<String> sendResetPasswordOtp(@RequestBody String email) throws MessagingException {
-        String cleanEmail = email.replaceAll("^\"|\"$", "");
-        userRepository.findByEmail(cleanEmail)
+    public ApiResponse<String> sendResetPasswordOtp(@RequestBody String contact) throws MessagingException {
+        // contact có thể là Email hoặc Tên tài khoản (Username)
+        String cleanContact = contact.replaceAll("^\"|\"$", "");
+
+        // 1. TÌM KIẾM USER: Thử tìm bằng Email trước, sau đó tìm bằng Username
+        User user = userRepository.findByEmail(cleanContact)
+                .or(() -> userRepository.findByAccountUsername(cleanContact)) // <--- THÊM LOGIC TÌM BẰNG USERNAME
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. Lấy EMAIL THẬT của User để gửi OTP (vì OTP chỉ gửi qua Email)
+        String actualEmail = user.getEmail();
+
+        // 3. TẠO VÀ GỬI OTP
         String otp = MailService.OtpService.generateOtp(6);
-        otpMailService.sendOtpEmail(cleanEmail, "đặt lại mật khẩu", otp);
-        otpStorageService.saveOtp(cleanEmail, otp, 5);
-        return new ApiResponse<>(SuccessCode.OTP_SEND_SUCCESSFULLY, cleanEmail);
+        otpMailService.sendOtpEmail(actualEmail, "đặt lại mật khẩu", otp);
+
+        // 4. LƯU OTP: Lưu bằng cleanContact (Email hoặc Username) để khớp với bước verify sau này
+        otpStorageService.saveOtp(cleanContact, otp, 5);
+
+        return new ApiResponse<>(SuccessCode.OTP_SEND_SUCCESSFULLY, cleanContact);
     }
 
     // === API MỚI: DÙNG CHO QUÊN MK (CÓ CHECK SĐT) ===

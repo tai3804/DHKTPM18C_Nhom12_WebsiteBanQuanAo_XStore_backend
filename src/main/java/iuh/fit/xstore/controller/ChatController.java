@@ -68,6 +68,9 @@ public class ChatController {
             map.put("userId", room.getUserId());
             map.put("sessionId", room.getSessionId());
             map.put("name", room.getName());
+            // Get unread count
+            long unreadCount = chatService.getChatRoomUnreadCount(room.getId());
+            map.put("unreadCount", unreadCount);
             // Get last message
             List<Chat> history = chatService.getChatHistory(room.getId());
             if (!history.isEmpty()) {

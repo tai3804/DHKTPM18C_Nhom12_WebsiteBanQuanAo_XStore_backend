@@ -23,7 +23,7 @@ public class ProductService {
     private final StockItemRepository stockItemRepository;
     
     public List<Product> findAll() {
-        return productRepository.findAll();
+        return productRepository.findAllWithComments();
     }
     
     public Product findById(int id) {
@@ -87,7 +87,7 @@ public class ProductService {
 
     public List<Product> searchProducts(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return productRepository.findAll();
+            return productRepository.findAllWithComments();
         }
         return productRepository.searchProducts(keyword.trim().toLowerCase());
     }
@@ -119,7 +119,7 @@ public class ProductService {
      * @return Filtered and sorted list of products
      */
     public List<Product> filterProducts(ProductFilterRequest filterRequest) {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findAllWithComments();
 
         // Filter by product type ID
         if (filterRequest.getProductTypeId() != null) {

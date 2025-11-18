@@ -2,6 +2,8 @@ package iuh.fit.xstore.service;
 
 import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
+import iuh.fit.xstore.dto.response.StockProductResponse;
+import iuh.fit.xstore.dto.response.StockProductInfoResponse;
 import iuh.fit.xstore.model.Stock;
 import iuh.fit.xstore.model.StockItem;
 import iuh.fit.xstore.repository.StockItemRepository;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import iuh.fit.xstore.repository.ProductInfoRepository;
 import iuh.fit.xstore.model.ProductInfo;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -53,9 +57,42 @@ public class StockService {
         return id;
     }
     //Stock Item
-    public List<StockItem> getItemsOfStock(int id) {
+    public List<StockProductResponse> getItemsOfStock(int id) {
         findById(id);
-        return stockItemRepo.findByStockIdWithProductInfo(id);
+        List<StockItem> stockItems = stockItemRepo.findByStockIdWithProductInfo(id);
+
+        // Group by product
+        Map<Integer, List<StockItem>> groupedByProduct = stockItems.stream()
+                .collect(Collectors.groupingBy(item -> item.getProductInfo().getProduct().getId()));
+
+        return groupedByProduct.entrySet().stream()
+                .map(entry -> {
+                    Integer productId = entry.getKey();
+                    List<StockItem> items = entry.getValue();
+                    var product = items.get(0).getProductInfo().getProduct();
+                    int totalQuantity = items.stream().mapToInt(StockItem::getQuantity).sum();
+
+                    List<StockProductInfoResponse> variants = items.stream()
+                            .map(item -> StockProductInfoResponse.builder()
+                                    .id(item.getProductInfo().getId())
+                                    .colorName(item.getProductInfo().getColorName())
+                                    .colorHexCode(item.getProductInfo().getColorHexCode())
+                                    .sizeName(item.getProductInfo().getSizeName())
+                                    .image(item.getProductInfo().getImage())
+                                    .quantity(item.getQuantity())
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    return StockProductResponse.builder()
+                            .id(product.getId())
+                            .name(product.getName())
+                            .image(product.getImage())
+                            .brand(product.getBrand())
+                            .totalQuantity(totalQuantity)
+                            .variants(variants)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
 

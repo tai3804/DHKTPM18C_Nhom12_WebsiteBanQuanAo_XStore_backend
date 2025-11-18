@@ -2,6 +2,7 @@ package iuh.fit.xstore.controller;
 
 import iuh.fit.xstore.dto.response.ApiResponse;
 import iuh.fit.xstore.dto.response.SuccessCode;
+import iuh.fit.xstore.dto.response.StockProductResponse;
 import iuh.fit.xstore.model.Stock;
 import iuh.fit.xstore.model.StockItem;
 import iuh.fit.xstore.service.StockService;
@@ -43,10 +44,9 @@ public class StockController {
         return new ApiResponse<>(SuccessCode.STOCK_DELETED, stockService.delete(id));
     }
 
-    //Stock item
     // Xem danh sách sản phẩm trong kho
     @GetMapping("/{id}/items")
-    ApiResponse<List<StockItem>> getItems(@PathVariable int id) {
+    ApiResponse<List<StockProductResponse>> getItems(@PathVariable int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, stockService.getItemsOfStock(id));
     }
 

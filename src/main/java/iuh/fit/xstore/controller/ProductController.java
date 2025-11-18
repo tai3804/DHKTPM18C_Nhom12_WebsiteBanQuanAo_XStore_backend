@@ -213,7 +213,6 @@ public class ProductController {
                 info.setColorName(infoReq.getColorName());
                 info.setColorHexCode(infoReq.getColorHexCode());
                 info.setSizeName(infoReq.getSizeName());
-                info.setQuantity(infoReq.getQuantity());
                 info.setImage(infoReq.getImage());
                 info.setProduct(product); // quan trọng: gán product để cascade lưu
                 return info;

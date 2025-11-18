@@ -14,6 +14,5 @@ public class ProductInfoResponse {
     private String colorName;
     private String colorHexCode;
     private String sizeName;
-    private int quantity;
     private String image;
 }

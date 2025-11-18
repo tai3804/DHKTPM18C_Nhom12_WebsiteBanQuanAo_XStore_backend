@@ -24,6 +24,8 @@ public class CartItemService {
     private StockRepository stockRepository;
     @Autowired
     private StockItemRepository stockItemRepository;
+    @Autowired
+    private ProductInfoRepository productInfoRepository;
 
     public List<CartItem> getAllCartItems() {
         return cartItemRepository.findAll();
@@ -39,7 +41,7 @@ public class CartItemService {
     }
 
     @Transactional
-    public CartItem addToCart(Integer cartId, Integer productId, Integer stockId, Integer quantity, String color, String size) {
+    public CartItem addToCart(Integer cartId, Integer productId, Integer stockId, Integer quantity, Integer productInfoId) {
         if (quantity <= 0) {
             throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
@@ -53,22 +55,37 @@ public class CartItemService {
         Stock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new AppException(ErrorCode.STOCK_NOT_FOUND));
 
-        // 1. Tìm số lượng tồn kho thực tế của sản phẩm này tại kho này
-        StockItem stockItem = stockItemRepository.findByStock_IdAndProduct_Id(stockId, productId)
-                .orElseThrow(() -> new AppException(ErrorCode.STOCK_ITEM_NOT_FOUND)); // Ném lỗi nếu sản phẩm không có trong kho này
+        ProductInfo productInfo = null;
+        if (productInfoId != null) {
+            productInfo = productInfoRepository.findById(productInfoId)
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_INFO_NOT_FOUND));
+            if (productInfo.getProduct().getId() != productId) {
+                throw new AppException(ErrorCode.INVALID_PRODUCT_INFO);
+            }
+        }
 
-        int availableQuantity = stockItem.getQuantity();
+        // 1. Kiểm tra tồn kho
+        int availableQuantity;
+        if (productInfo != null) {
+            // Lấy số lượng từ StockItem theo productInfo và stock
+            StockItem stockItem = stockItemRepository.findByStock_IdAndProductInfo_Id(stockId, productInfo.getId())
+                    .orElse(null);
+            availableQuantity = stockItem != null ? stockItem.getQuantity() : 0;
+        } else {
+            // Nếu không có productInfo, không thể thêm vào giỏ (vì giờ quantity ở StockItem)
+            throw new AppException(ErrorCode.PRODUCT_INFO_REQUIRED);
+        }
 
         if (availableQuantity <= 0) {
-            throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY); // Hết hàng
+            throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY);
         }
 
         // 2. Tìm xem item này đã có trong giỏ hàng chưa
         Optional<CartItem> existingItemOpt = cartItemRepository
-                .findByCartIdAndProductIdAndStockIdAndColorAndSize(cartId, productId, stockId, color, size);
+                .findByCartIdAndProductIdAndStockIdAndProductInfoId(cartId, productId, stockId, productInfoId);
 
         CartItem cartItem;
-        int newQuantity; // Biến để tính số lượng mới
+        int newQuantity;
 
         if (existingItemOpt.isPresent()) {
             // 3. Đã tồn tại: Tính số lượng mới
@@ -79,15 +96,13 @@ public class CartItemService {
             cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setProduct(product);
-            cartItem.setStock(stock); // Lưu stock
-            cartItem.setColor(color);
-            cartItem.setSize(size);
+            cartItem.setStock(stock);
+            cartItem.setProductInfo(productInfo);
             newQuantity = quantity;
         }
 
         // --- KIỂM TRA SỐ LƯỢNG MỚI VỚI TỒN KHO ---
         if (newQuantity > availableQuantity) {
-            // Nếu số lượng trong giỏ VƯỢT QUÁ số lượng có sẵn trong kho
             throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY);
         }
         // --- KẾT THÚC KIỂM TRA ---
@@ -95,7 +110,7 @@ public class CartItemService {
         // 5. Set số lượng mới
         cartItem.setQuantity(newQuantity);
 
-        // Thêm vào list của Cart nếu là item mới (chỉ khi chưa tồn tại)
+        // Thêm vào list của Cart nếu là item mới
         if (!existingItemOpt.isPresent()) {
             cart.getCartItems().add(cartItem);
         }

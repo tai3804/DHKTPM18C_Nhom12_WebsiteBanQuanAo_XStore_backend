@@ -1,8 +1,12 @@
 package iuh.fit.xstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +30,10 @@ public class ProductInfo {
     private String colorName;
     private String colorHexCode;
     private String sizeName;
-    private int quantity;
     private String image;
+
+    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<StockItem> stockItems = new ArrayList<>();
 }

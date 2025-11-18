@@ -12,8 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"productInfos", "orderItems", "stockItems", "comments"})
-@EqualsAndHashCode(exclude = {"productInfos", "orderItems", "stockItems", "comments"})
+@ToString(exclude = {"productInfos", "orderItems", "comments", "productSales"})
+@EqualsAndHashCode(exclude = {"productInfos", "orderItems", "comments", "productSales"})
 @Builder
 @Entity
 @Table(name = "products")
@@ -41,7 +41,7 @@ public class Product {
     private double price;
 
     @Column(name = "is_sale")
-    private boolean isSale;
+    private Boolean isSale;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"product"})
@@ -52,11 +52,6 @@ public class Product {
     @JsonIgnore
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    @Builder.Default
-    private List<StockItem> stockItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product", "author"})

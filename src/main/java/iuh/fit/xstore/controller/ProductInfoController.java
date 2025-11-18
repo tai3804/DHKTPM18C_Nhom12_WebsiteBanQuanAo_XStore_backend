@@ -305,33 +305,6 @@ public class ProductInfoController {
     }
 
     /**
-     * PATCH /api/products/info/{id}/quantity - Cập nhật số lượng
-     */
-    @PatchMapping("/info/{id}/quantity")
-    public ResponseEntity<?> updateQuantity(
-            @PathVariable int id,
-            @RequestParam int quantity) {
-        try {
-            ProductInfo updated = productInfoService.updateQuantity(id, quantity);
-            
-            ApiResponse<ProductInfo> response = new ApiResponse<>(
-                    200,
-                    "Cập nhật số lượng thành công",
-                    updated
-            );
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            ApiResponse<?> errorResponse = new ApiResponse<>(
-                    400,
-                    e.getMessage(),
-                    null
-            );
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
-    }
-
-    /**
      * DELETE /api/products/info/{id} - Xóa product info
      */
     @DeleteMapping("/info/{id}")

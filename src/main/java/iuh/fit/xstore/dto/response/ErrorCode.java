@@ -31,6 +31,8 @@ public enum ErrorCode {
     PRODUCT_TYPE_EXISTED(409, "Product type already exists"),
     PRODUCT_INFO_NOT_FOUND(404, "Product info not found"),
     PRODUCT_INFO_EXISTED(409, "Product info already exists"),
+    PRODUCT_INFO_REQUIRED(400, "Product info is required"),
+    INVALID_PRODUCT_INFO(400, "Invalid product info"),
 
 //    === ADDRESS ===
     ADDRESS_NOT_FOUND(404, "Address not found"),
@@ -50,6 +52,10 @@ public enum ErrorCode {
     // ===== ORDER ITEM =====
     ORDER_ITEM_NOT_FOUND(404, "Order item not found"),
     ORDER_ITEM_EXISTED(409, "Order item already exists"),
+
+    // ===== REQUEST =====
+    REQUEST_NOT_FOUND(404, "Request not found"),
+    REQUEST_ALREADY_EXISTS(409, "Request already exists for this order"),
     TOKEN_EXPIRED(403, "Token has expired"),
 
     // === Discount Errors ===

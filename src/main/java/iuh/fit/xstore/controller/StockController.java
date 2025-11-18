@@ -53,35 +53,35 @@ public class StockController {
     // Tạo mới hoặc cập nhật số lượng
     @PostMapping("/{id}/items")
     ApiResponse<StockItem> setItemQuantity(@PathVariable int id,
-                                           @RequestParam int productId,
+                                           @RequestParam int productInfoId,
                                            @RequestParam int quantity) {
         return new ApiResponse<>(SuccessCode.STOCK_ITEM_UPDATED,
-                stockService.setItemQuantity(id, productId, quantity));
+                stockService.setItemQuantity(id, productInfoId, quantity));
     }
 
     // Tăng số lượng
     @PostMapping("/{id}/items/increase")
     ApiResponse<StockItem> increaseItemQuantity(@PathVariable int id,
-                                                @RequestParam int productId,
+                                                @RequestParam int productInfoId,
                                                 @RequestParam int amount) {
         return new ApiResponse<>(SuccessCode.STOCK_ITEM_UPDATED,
-                stockService.increaseItemQuantity(id, productId, amount));
+                stockService.increaseItemQuantity(id, productInfoId, amount));
     }
 
     // Giảm số lượng
     @PostMapping("/{id}/items/decrease")
     ApiResponse<StockItem> decreaseItemQuantity(@PathVariable int id,
-                                                @RequestParam int productId,
+                                                @RequestParam int productInfoId,
                                                 @RequestParam int amount) {
         return new ApiResponse<>(SuccessCode.STOCK_ITEM_UPDATED,
-                stockService.decreaseItemQuantity(id, productId, amount));
+                stockService.decreaseItemQuantity(id, productInfoId, amount));
     }
 
     // Xóa sản phẩm khỏi kho
     @DeleteMapping("/{id}/items")
     ApiResponse<Void> deleteItem(@PathVariable int id,
-                                 @RequestParam int productId) {
-        stockService.deleteItem(id, productId);
+                                 @RequestParam int productInfoId) {
+        stockService.deleteItem(id, productInfoId);
         return new ApiResponse<>(SuccessCode.STOCK_ITEM_DELETED, null);
     }
 }

@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"stock", "product"}) // tránh đệ quy
+@ToString(exclude = {"stock", "productInfo"}) // tránh đệ quy
 @EqualsAndHashCode
 @Builder
 @Entity
@@ -25,8 +25,9 @@ public class StockItem {
     private Stock stock;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(name = "product_info_id")
+    @JsonIgnoreProperties({"product", "stockItems"})
+    private ProductInfo productInfo;
 
     private int quantity;
 }

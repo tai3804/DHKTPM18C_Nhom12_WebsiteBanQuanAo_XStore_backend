@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
+@ToString(exclude = {"product"})
+@EqualsAndHashCode(exclude = {"product"})
 @Builder
 @Entity
 @Table(name = "product_sales")

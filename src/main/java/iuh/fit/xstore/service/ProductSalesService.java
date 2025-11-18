@@ -41,7 +41,7 @@ public class ProductSalesService {
         ProductSales saved = productSalesRepository.save(productSales);
 
         // Update Product.isSale
-        product.setSale(true);
+        product.setIsSale(true);
         productRepository.save(product);
 
         return saved;
@@ -55,7 +55,7 @@ public class ProductSalesService {
 
             // Update Product.isSale
             Product product = productSalesOpt.get().getProduct();
-            product.setSale(false);
+            product.setIsSale(false);
             productRepository.save(product);
         }
     }

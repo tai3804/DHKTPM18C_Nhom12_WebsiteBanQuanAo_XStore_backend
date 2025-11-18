@@ -91,11 +91,6 @@ public class ProductInfoService {
         
         productInfo.setProduct(product);
         
-        // Validate quantity
-        if (productInfo.getQuantity() < 0) {
-            throw new AppException(ErrorCode.INVALID_QUANTITY);
-        }
-        
         return productInfoRepository.save(productInfo);
     }
 
@@ -115,29 +110,11 @@ public class ProductInfoService {
         if (productInfo.getSizeName() != null) {
             existingInfo.setSizeName(productInfo.getSizeName());
         }
-        if (productInfo.getQuantity() >= 0) {
-            existingInfo.setQuantity(productInfo.getQuantity());
-        }
         if (productInfo.getImage() != null) {
             existingInfo.setImage(productInfo.getImage());
         }
         
         return productInfoRepository.save(existingInfo);
-    }
-
-    /**
-     * Cập nhật số lượng
-     */
-    @Transactional
-    public ProductInfo updateQuantity(int id, int quantity) {
-        ProductInfo productInfo = findById(id);
-        
-        if (quantity < 0) {
-            throw new AppException(ErrorCode.INVALID_QUANTITY);
-        }
-        
-        productInfo.setQuantity(quantity);
-        return productInfoRepository.save(productInfo);
     }
 
     /**

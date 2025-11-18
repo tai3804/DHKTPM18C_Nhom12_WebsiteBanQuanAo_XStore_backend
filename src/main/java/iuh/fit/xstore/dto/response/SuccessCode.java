@@ -50,6 +50,10 @@ public enum SuccessCode {
     ORDER_ITEM_UPDATED(200, "Order item updated successfully"),
     ORDER_ITEM_DELETED(200, "Order item deleted successfully"),
 
+    // ===== REQUEST =====
+    REQUEST_CREATED(201, "Request created successfully"),
+    REQUEST_UPDATED(200, "Request updated successfully"),
+
     // === Discount Success ===
     DISCOUNT_CREATED(201, "Discount created successfully"),
     DISCOUNT_UPDATED(200, "Discount updated successfully"),

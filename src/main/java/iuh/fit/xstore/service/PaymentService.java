@@ -102,8 +102,8 @@ public class PaymentService {
                     .quantity(cartItem.getQuantity())
                     .unitPrice(unitPrice)
                     .subTotal(itemSubtotal)
-                    .color(cartItem.getColor() != null ? cartItem.getColor() : "")
-                    .size(cartItem.getSize() != null ? cartItem.getSize() : "")
+                    .color(cartItem.getProductInfo() != null ? cartItem.getProductInfo().getColorName() : "")
+                    .size(cartItem.getProductInfo() != null ? cartItem.getProductInfo().getSizeName() : "")
                     .build();
 
             orderItems.add(orderItem);
@@ -123,35 +123,61 @@ public class PaymentService {
 
         order.setOrderItems(orderItems);
 
-        // 5. Xử lý giảm giá
+        // 5. Xử lý giảm giá từ danh sách discountIds (tối đa 3 cho hoá đơn)
         double discountAmount = 0;
         
-        // Nếu có discountId, ưu tiên sử dụng discount từ database
-        if (request.getDiscountId() > 0) {
-            Discount discount = discountRepo.findById(request.getDiscountId())
-                    .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
-
-            // Kiểm tra discount có hợp lệ không với user hiện tại
-            if (!discount.isValidForUser(user)) {
-                log.warn("⚠️ Discount code is invalid, expired, or not applicable for user type: {}", discount.getId());
-                throw new AppException(ErrorCode.INVALID_DISCOUNT);
+        if (request.getDiscountIds() != null && !request.getDiscountIds().isEmpty()) {
+            // Giới hạn tối đa 3 mã giảm giá
+            List<Integer> validDiscountIds = request.getDiscountIds().stream()
+                    .filter(id -> id != null && id > 0)
+                    .distinct()
+                    .limit(3)
+                    .toList();
+            
+            for (Integer discountId : validDiscountIds) {
+                try {
+                    Discount discount = discountRepo.findById(discountId)
+                            .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+                    
+                    // Kiểm tra discount có hợp lệ không với user hiện tại
+                    if (!discount.isValidForUser(user)) {
+                        log.warn("⚠️ Discount code {} is invalid, expired, or not applicable for user type: {}", discountId, discount.getId());
+                        continue; // Bỏ qua discount không hợp lệ
+                    }
+                    
+                    // Chỉ áp dụng discount cho PRODUCT (hoá đơn), không cho SHIPPING
+                    if (!"PRODUCT".equals(discount.getCategory()) && !"SHIPPING".equals(discount.getCategory())) {
+                        // Nếu category null hoặc khác, mặc định coi là PRODUCT
+                        if (discount.getCategory() != null && !"PRODUCT".equals(discount.getCategory())) {
+                            log.warn("⚠️ Discount {} is for {}, skipping for product discount", discountId, discount.getCategory());
+                            continue;
+                        }
+                    }
+                    
+                    // Tính giảm giá: lấy min giữa discount fixed amount và discount percent
+                    double currentDiscount = Math.min(
+                            discount.getDiscountAmount(),
+                            (long)(subtotal * discount.getDiscountPercent() / 100)
+                    );
+                    
+                    discountAmount += currentDiscount;
+                    
+                    // Tăng số lần sử dụng
+                    discount.setUsageCount(discount.getUsageCount() + 1);
+                    discountRepo.save(discount);
+                    
+                    log.info("✅ Applied discount: {} (Amount: {}₫)", discount.getName(), currentDiscount);
+                    
+                } catch (Exception e) {
+                    log.warn("⚠️ Error processing discount {}: {}", discountId, e.getMessage());
+                    // Tiếp tục với discount tiếp theo
+                }
             }
-
-            // Tính giảm giá: lấy min giữa discount fixed amount và discount percent
-            discountAmount = Math.min(
-                    discount.getDiscountAmount(),
-                    (long)(subtotal * discount.getDiscountPercent() / 100)
-            );
-
-            // Tăng số lần sử dụng
-            discount.setUsageCount(discount.getUsageCount() + 1);
-            discountRepo.save(discount);
-            log.info("✅ Discount applied: {} (Amount: {}₫)", discount.getId(), discountAmount);
-        } 
-        // Nếu không có discountId nhưng có discountAmount từ request
-        else if (request.getDiscountAmount() > 0) {
-            discountAmount = Math.min(request.getDiscountAmount(), subtotal);
-            log.info("✅ Manual discount applied: {}₫", discountAmount);
+            
+            // Đảm bảo tổng giảm giá không vượt quá subtotal
+            discountAmount = Math.min(discountAmount, subtotal);
+            
+            log.info("✅ Total discount applied from {} codes: {}₫", validDiscountIds.size(), discountAmount);
         }
 
         // 6. Tính phí vận chuyển

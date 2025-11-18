@@ -8,8 +8,14 @@ import iuh.fit.xstore.model.Order;
 import iuh.fit.xstore.model.OrderItem;
 import iuh.fit.xstore.service.OrderService;
 import iuh.fit.xstore.service.PaymentService;
+import iuh.fit.xstore.service.PdfService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -19,6 +25,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final PaymentService paymentService;
+    private final PdfService pdfService;
 
     // ========== ORDER ==========
     @GetMapping
@@ -133,5 +140,57 @@ public class OrderController {
         List<Order> orders = paymentService.getUserOrders(userId);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
                 SuccessCode.FETCH_SUCCESS.getMessage(), orders);
+    }
+
+    // ========== PDF EXPORT ==========
+    @GetMapping("/{id}/pdf")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<byte[]> downloadOrderPdf(@PathVariable int id, Authentication authentication) {
+        try {
+            // Kiểm tra đơn hàng tồn tại
+            var order = orderService.findOrderById(id);
+            if (order == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Kiểm tra quyền truy cập - chỉ chủ đơn hàng hoặc admin mới có thể tải PDF
+            String currentUsername = authentication.getName();
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            boolean isOrderOwner = order.getUser() != null &&
+                    order.getUser().getAccount().getUsername() != null &&
+                    order.getUser().getAccount().getUsername().equals(currentUsername);
+
+            if (!isAdmin && !isOrderOwner) {
+                return ResponseEntity.status(403).build(); // Forbidden
+            }
+
+            // Tạo PDF
+            byte[] pdfBytes = pdfService.generateOrderPdf(order);
+
+            if (pdfBytes == null || pdfBytes.length == 0) {
+                return ResponseEntity.internalServerError().build();
+            }
+
+            // Thiết lập headers cho file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "don-hang-" + id + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+        } catch (IllegalArgumentException e) {
+            // Lỗi tham số không hợp lệ
+            System.err.println("Lỗi tham số không hợp lệ khi tạo PDF cho đơn hàng " + id + ": " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            // Log lỗi và trả về lỗi server
+            System.err.println("Lỗi khi tạo PDF cho đơn hàng " + id + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

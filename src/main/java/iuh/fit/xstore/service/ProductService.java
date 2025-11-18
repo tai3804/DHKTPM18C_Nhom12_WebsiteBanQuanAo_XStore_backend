@@ -4,6 +4,7 @@ import iuh.fit.xstore.dto.request.ProductFilterRequest;
 import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.model.Product;
+import iuh.fit.xstore.model.ProductInfo;
 import iuh.fit.xstore.model.ProductType;
 import iuh.fit.xstore.model.StockItem;
 import iuh.fit.xstore.repository.ProductRepository;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,21 +96,27 @@ public class ProductService {
 
     public List<Object> getProductStocks(int productId) {
         // Verify product exists
-        findById(productId);
+        Product product = findById(productId);
         
-        // Get all stock items for this product
-        List<StockItem> stockItems = stockItemRepository.findByProduct_Id(productId);
+        // Get all product infos for this product
+        List<ProductInfo> productInfos = product.getProductInfos();
         
-        // Transform to simplified format for frontend
-        return stockItems.stream()
-                .map(item -> {
-                    java.util.Map<String, Object> stockInfo = new java.util.HashMap<>();
-                    stockInfo.put("stockId", item.getStock().getId());
-                    stockInfo.put("stockName", item.getStock().getName());
-                    stockInfo.put("quantity", item.getQuantity());
-                    return stockInfo;
-                })
-                .collect(java.util.stream.Collectors.toList());
+        // For each product info, get stock items
+        List<Object> result = new ArrayList<>();
+        for (ProductInfo info : productInfos) {
+            List<StockItem> stockItems = stockItemRepository.findByProductInfo_Id(info.getId());
+            for (StockItem item : stockItems) {
+                java.util.Map<String, Object> stockInfo = new java.util.HashMap<>();
+                stockInfo.put("stockId", item.getStock().getId());
+                stockInfo.put("stockName", item.getStock().getName());
+                stockInfo.put("productInfoId", info.getId());
+                stockInfo.put("colorName", info.getColorName());
+                stockInfo.put("sizeName", info.getSizeName());
+                result.add(stockInfo);
+            }
+        }
+        
+        return result;
     }
 
 

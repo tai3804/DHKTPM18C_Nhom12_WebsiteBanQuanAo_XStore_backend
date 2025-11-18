@@ -25,9 +25,9 @@ public class CheckoutRequest {
     private String shippingAddress;        // Địa chỉ giao hàng
     private String phoneNumber;            // Số điện thoại nhận hàng (duplicate with recipientPhone?)
     private String notes;                  // Ghi chú đơn hàng
-    private double discountAmount;         // Số tiền giảm giá
-    private int discountId;                // ID mã giảm giá (optional)
-    private Integer shippingDiscountId;    // ID mã giảm phí vận chuyển (optional)
+    private double discountAmount;         // Số tiền giảm giá (tính từ discountIds)
+    private List<Integer> discountIds;       // Danh sách ID mã giảm giá (tối đa 3 cho hoá đơn)
+    private Integer shippingDiscountId;    // ID mã giảm phí vận chuyển (tối đa 1)
 }
 
 class CheckoutItemRequest {

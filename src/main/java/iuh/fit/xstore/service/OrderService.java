@@ -21,7 +21,7 @@ public class OrderService {
     private final StockService stockService;
 
     public List<Order> findAllOrders() {
-        return orderRepo.findAll();
+        return orderRepo.findAllWithUser();
     }
 
     public Order findOrderById(int id) {

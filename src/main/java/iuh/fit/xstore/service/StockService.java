@@ -9,8 +9,8 @@ import iuh.fit.xstore.repository.StockRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import iuh.fit.xstore.repository.ProductRepository;
-import iuh.fit.xstore.model.Product;
+import iuh.fit.xstore.repository.ProductInfoRepository;
+import iuh.fit.xstore.model.ProductInfo;
 import java.util.List;
 
 @Service
@@ -18,7 +18,7 @@ import java.util.List;
 public class StockService {
     private final StockRepository stockRepo;
     private final StockItemRepository stockItemRepo;
-    private final ProductRepository productRepo;
+    private final ProductInfoRepository productInfoRepo;
 
     //Stock
     public List<Stock> findAll() {
@@ -55,24 +55,24 @@ public class StockService {
     //Stock Item
     public List<StockItem> getItemsOfStock(int id) {
         findById(id);
-        return stockItemRepo.findByStock_Id(id);
+        return stockItemRepo.findByStockIdWithProductInfo(id);
     }
 
 
-    public StockItem setItemQuantity(int id, int productId, int newQuantity) {
+    public StockItem setItemQuantity(int id, int productInfoId, int newQuantity) {
         //kiểm tra số lượng
         if (newQuantity < 0) throw new AppException(ErrorCode.INVALID_QUANTITY);
 
         Stock stock = findById(id);
-        //tìm sp trong hệ thống
-        Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        //tìm productInfo trong hệ thống
+        ProductInfo productInfo = productInfoRepo.findById(productInfoId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_INFO_NOT_FOUND));
         //tìm sản phẩm có trong kho chưa nếu chưa thì tạo mới
-        StockItem item = stockItemRepo.findByStock_IdAndProduct_Id(id, productId)
+        StockItem item = stockItemRepo.findByStock_IdAndProductInfo_Id(id, productInfoId)
                 .orElseGet(() -> {
                     StockItem si = new StockItem();
                     si.setStock(stock);
-                    si.setProduct(product);
+                    si.setProductInfo(productInfo);
                     si.setQuantity(0);
                     return si;
                 });
@@ -82,20 +82,20 @@ public class StockService {
     }
 
 
-    public StockItem increaseItemQuantity(int id, int productId, int amount) {
+    public StockItem increaseItemQuantity(int id, int productInfoId, int amount) {
         if ( amount <= 0) throw new AppException(ErrorCode.INVALID_QUANTITY);
 
-        StockItem item = stockItemRepo.findByStock_IdAndProduct_Id(id, productId)
-                .orElseGet(() -> setItemQuantity(id, productId, 0));
+        StockItem item = stockItemRepo.findByStock_IdAndProductInfo_Id(id, productInfoId)
+                .orElseGet(() -> setItemQuantity(id, productInfoId, 0));
 
         item.setQuantity(item.getQuantity() + amount);
         return stockItemRepo.save(item);
     }
 
-    public StockItem decreaseItemQuantity(int id, int productId, int amount) {
+    public StockItem decreaseItemQuantity(int id, int productInfoId, int amount) {
         if ( amount <= 0) throw new AppException(ErrorCode.INVALID_QUANTITY);
 
-        StockItem item = stockItemRepo.findByStock_IdAndProduct_Id(id, productId)
+        StockItem item = stockItemRepo.findByStock_IdAndProductInfo_Id(id, productInfoId)
                 .orElseThrow(() -> new AppException(ErrorCode.STOCK_ITEM_NOT_FOUND));
 
         int after = item.getQuantity() - amount;
@@ -105,8 +105,8 @@ public class StockService {
         return stockItemRepo.save(item);
     }
     // xóa sp khỏi kho
-    public void deleteItem(int id, int productId) {
-        StockItem item = stockItemRepo.findByStock_IdAndProduct_Id(id, productId)
+    public void deleteItem(int id, int productInfoId) {
+        StockItem item = stockItemRepo.findByStock_IdAndProductInfo_Id(id, productInfoId)
                 .orElseThrow(() -> new AppException(ErrorCode.STOCK_ITEM_NOT_FOUND));
         stockItemRepo.delete(item);
     }

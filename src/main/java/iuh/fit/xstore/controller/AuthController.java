@@ -101,15 +101,17 @@ public class AuthController {
         return new ApiResponse<>(SuccessCode.REGISTER_SUCCESSFULLY, user);
     }
 
-    // ================= RESET PASSWORD (ĐÃ SỬA THÔNG MINH HƠN) =================
+    // ================= RESET PASSWORD (ĐÃ CẬP NHẬT TÌM KIẾM THEO USERNAME) =================
     @PostMapping("/reset-password")
     public ApiResponse<?> resetPassword(@RequestBody ResetPasswordRequest request) {
 
-        // DTO request.getUsername() bây giờ có thể là EMAIL hoặc SĐT
+        // DTO request.getUsername() có thể là EMAIL, USERNAME, hoặc PHONE
         String contact = request.getUsername();
 
+        // TÌM KIẾM THEO THỨ TỰ ƯU TIÊN: EMAIL -> USERNAME -> PHONE
         User user = userRepository.findByEmail(contact)
-                .or(() -> userRepository.findByPhone(contact)) // Thử tìm SĐT
+                .or(() -> userRepository.findByAccountUsername(contact)) // <--- Đã thêm tìm kiếm bằng Username
+                .or(() -> userRepository.findByPhone(contact))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         Account account = user.getAccount();
@@ -132,7 +134,7 @@ public class AuthController {
             }
 
             String otp = otpService.generateOtp(request.getPhoneNumber());
-            
+
             Map<String, Object> data = new HashMap<>();
             data.put("message", "OTP sent successfully to " + request.getPhoneNumber());
             data.put("expiryMinutes", 5);
@@ -160,7 +162,7 @@ public class AuthController {
 
             // Verify OTP
             boolean isValid = otpService.verifyOtp(request.getPhoneNumber(), request.getOtp().trim());
-            
+
             if (!isValid) {
                 return new ApiResponse<>(ErrorCode.OTP_INVALID_OR_EXPIRATION);
             }
@@ -168,7 +170,7 @@ public class AuthController {
             // OTP verified - update user's phone and verification status
             // This is done when user is logged in and updates their account
             log.info("OTP verified successfully for phone: {}", request.getPhoneNumber());
-            
+
             Map<String, Object> data = new HashMap<>();
             data.put("message", "Phone verified successfully");
             data.put("phoneNumber", request.getPhoneNumber());

@@ -420,7 +420,7 @@ INSERT IGNORE INTO stock_items (id, stock_id, product_id, quantity) VALUES
 -- Quần Ống Rộng Nam (36)
 (106, 1, 36, 45), (107, 2, 36, 60), (108, 3, 36, 35),
 -- Quần Legging Nữ (37)
-(109, 1, 37, 65), (110, 2, 37, 85), (111, 3, 37, 50),
+(109, 1, 37, 65), (110, 2, 37, 85), (111,  3, 37, 50),
 -- Quần Tây Nữ (38)
 (112, 1, 38, 50), (113, 2, 38, 70), (114, 3, 38, 40),
 -- Quần Short Nữ (39)
@@ -549,4 +549,26 @@ INSERT IGNORE INTO products (id, name, description, image, product_type_id, bran
 (48, 'Khăn Choàng Nữ Scarf', 'Khăn choàng nữ scarf lụa mềm mại. Họa tiết hoa văn tinh tế.', 'https://images.unsplash.com/photo-1601762603339-fd61e28b698a?w=400', 6, 'X-Store', 'Silk', 220000, 319000),
 (49, 'Vòng Tay Nữ Bracelet', 'Vòng tay nữ bracelet da thắt nút. Thiết kế minimalist.', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400', 6, 'X-Store', 'Leather', 150000, 219000),
 (50, 'Mũ Lưỡi Trai Unisex', 'Mũ lưỡi trai unisex cotton. Thiết kế baseball cap phong cách Mỹ.', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400', 6, 'X-Store', 'Cotton', 180000, 259000);
+
+-- Insert sample comments
+INSERT IGNORE INTO comments (id, product_id, author_id, author, text, comment_at, rate) VALUES
+-- Comments for Áo Thun Nam Basic Cotton (Product 1)
+(1, 1, 1, 'Trần Minh Tuấn', 'Áo chất vải mát, form đẹp, mặc rất thoải mái. Sẽ ủng hộ shop tiếp.', '2025-10-20 10:30:00', 5),
+(2, 1, 2, 'Lê Thị Hoa', 'Chất lượng tốt, giá cả hợp lý. Giao hàng nhanh. Rất hài lòng.', '2025-10-21 15:00:00', 5),
+(3, 1, 3, 'Phạm Văn Hùng', 'Áo màu đen đẹp, không bị ra màu khi giặt. Form áo vừa vặn.', '2025-10-22 09:00:00', 4),
+
+-- Comments for Áo Sơ Mi Nam Công Sở (Product 2)
+(4, 2, 1, 'Trần Minh Tuấn', 'Sơ mi mặc đi làm rất lịch sự. Vải ít nhăn, dễ ủi. Sẽ mua thêm màu khác.', '2025-11-01 11:00:00', 5),
+(5, 2, 2, 'Lê Thị Hoa', 'Form slim fit tôn dáng, chất vải thoáng mát. Rất đáng tiền.', '2025-11-02 14:20:00', 5),
+
+-- Comments for Quần Jeans Nữ Skinny (Product 10)
+(6, 10, 3, 'Phạm Văn Hùng', 'Quần jeans co giãn tốt, mặc rất thoải mái. Dáng skinny tôn chân dài.', '2025-11-05 18:00:00', 5),
+(7, 10, 4, 'Hoàng Thị Thu', 'Bạn gái mình rất thích quần này. Chất jean mềm, không bị cứng.', '2025-11-06 20:10:00', 4),
+
+-- Comments for Giày Sneaker Nam Basic (Product 13)
+(8, 13, 5, 'Vũ Đức Anh', 'Giày đi êm chân, kiểu dáng basic dễ phối đồ. Rất ưng ý.', '2025-11-10 08:45:00', 5),
+(9, 13, 6, 'Đặng Thuỳ Linh', 'Đã mua đôi thứ 2 ở shop. Chất lượng không đổi, giao hàng vẫn nhanh như một cơn gió.', '2025-11-11 12:00:00', 5),
+
+-- Comments for Áo Khoác Blazer Nữ (Product 6)
+(10, 6, 7, 'Bùi Quang Huy', 'Blazer form đẹp, mặc lên sang chảnh. Phù hợp cho các buổi tiệc hoặc đi làm.', '2025-11-12 19:30:00', 5);
 

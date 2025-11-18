@@ -1,5 +1,5 @@
 jwt:
-  key: ${SECRECT_KEY}
+  key: ${SECRET_KEY}
 
 spring:
   application:

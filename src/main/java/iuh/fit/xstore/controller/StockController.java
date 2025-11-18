@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stocks")
@@ -83,5 +84,11 @@ public class StockController {
                                  @RequestParam int productInfoId) {
         stockService.deleteItem(id, productInfoId);
         return new ApiResponse<>(SuccessCode.STOCK_ITEM_DELETED, null);
+    }
+
+    // Lấy tổng số lượng của tất cả variants của product từ tất cả kho
+    @GetMapping("/products/{productId}/total-quantities")
+    ApiResponse<Map<Integer, Integer>> getTotalQuantitiesForProduct(@PathVariable int productId) {
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, stockService.getTotalQuantitiesForProduct(productId));
     }
 }

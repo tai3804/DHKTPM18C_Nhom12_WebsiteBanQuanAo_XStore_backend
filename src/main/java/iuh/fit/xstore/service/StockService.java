@@ -147,4 +147,14 @@ public class StockService {
                 .orElseThrow(() -> new AppException(ErrorCode.STOCK_ITEM_NOT_FOUND));
         stockItemRepo.delete(item);
     }
+
+    // Lấy tổng số lượng của tất cả variants của product từ tất cả kho
+    public Map<Integer, Integer> getTotalQuantitiesForProduct(int productId) {
+        List<StockItem> stockItems = stockItemRepo.findByProductInfo_Product_Id(productId);
+        return stockItems.stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getProductInfo().getId(),
+                        Collectors.summingInt(StockItem::getQuantity)
+                ));
+    }
 }

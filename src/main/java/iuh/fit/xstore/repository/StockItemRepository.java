@@ -20,5 +20,7 @@ public interface StockItemRepository extends JpaRepository<StockItem,Integer> {
 
     @Query("SELECT si FROM StockItem si LEFT JOIN FETCH si.productInfo pi LEFT JOIN FETCH pi.product WHERE si.stock.id = :stockId")
     List<StockItem> findByStockIdWithProductInfo(@Param("stockId") int stockId);
+
+    List<StockItem> findByProductInfo_Product_Id(int productInfoProductId);
 }
 

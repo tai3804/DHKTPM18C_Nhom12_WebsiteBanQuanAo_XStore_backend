@@ -86,6 +86,8 @@ public class AuthController {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .dob(request.getDob())
+                .email(request.getEmail())
+                .phone(request.getPhone())
                 .account(Account.builder()
                         .username(request.getUsername())
                         .password(passwordEncoder.encode(request.getPassword()))

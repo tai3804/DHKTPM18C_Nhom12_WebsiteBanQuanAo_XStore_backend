@@ -64,6 +64,119 @@ public class DataInitializer {
                 userRepo.save(customerUser);
                 log.info("Default customer user created: username=hien, password=hien");
             }
+
+            if (!userRepo.existsByAccountUsername("loc")) {
+                User customerUser = User.builder()
+                        .firstName("Loc")
+                        .lastName("Nguyen")
+                        .account(
+                                Account.builder()
+                                        .username("loc")
+                                        .password(passwordEncoder.encode("loc"))
+                                        .role(Role.CUSTOMER)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
+
+                userRepo.save(customerUser);
+                log.info("Default customer user created: username=hien, password=hien");
+            }
+
+            if (!userRepo.existsByAccountUsername("ly")) {
+                User customerUser = User.builder()
+                        .firstName("Ly")
+                        .lastName("Nguyen")
+                        .account(
+                                Account.builder()
+                                        .username("ly")
+                                        .password(passwordEncoder.encode("ly"))
+                                        .role(Role.CUSTOMER)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
+
+                userRepo.save(customerUser);
+                log.info("Default customer user created: username=hien, password=hien");
+            }
+
+            if (!userRepo.existsByAccountUsername("thuy")) {
+                User customerUser = User.builder()
+                        .firstName("Thuy")
+                        .lastName("Nguyen")
+                        .account(
+                                Account.builder()
+                                        .username("thuy")
+                                        .password(passwordEncoder.encode("thuy"))
+                                        .role(Role.CUSTOMER)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
+
+                userRepo.save(customerUser);
+                log.info("Default customer user created: username=hien, password=hien");
+            }
+
+            if (!userRepo.existsByAccountUsername("thanh")) {
+                User customerUser = User.builder()
+                        .firstName("Thanh")
+                        .lastName("Nguyen")
+                        .account(
+                                Account.builder()
+                                        .username("thanh")
+                                        .password(passwordEncoder.encode("thanh"))
+                                        .role(Role.CUSTOMER)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
+
+                userRepo.save(customerUser);
+                log.info("Default customer user created: username=hien, password=hien");
+            }
+
+            if (!userRepo.existsByAccountUsername("tai")) {
+                User customerUser = User.builder()
+                        .firstName("Tai")
+                        .lastName("Tran")
+                        .account(
+                                Account.builder()
+                                        .username("tai")
+                                        .password(passwordEncoder.encode("tai"))
+                                        .role(Role.CUSTOMER)
+                                        .build()
+                        )
+                        .cart(
+                                Cart.builder()
+                                        .total(0)
+                                        .build()
+                        )
+                        .build();
+
+                userRepo.save(customerUser);
+                log.info("Default customer user created: username=hien, password=hien");
+            }
+
         };
+
+
     }
 }

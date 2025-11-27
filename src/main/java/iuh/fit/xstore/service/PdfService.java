@@ -353,6 +353,7 @@ public class PdfService {
     private String getStatusText(String status) {
         return switch (status.toUpperCase()) {
             case "PENDING" -> "Chờ xác nhận";
+            case "AWAITING_PAYMENT" -> "Chờ thanh toán";
             case "CONFIRMED" -> "Đã xác nhận";
             case "PROCESSING" -> "Đang xử lý";
             case "IN_TRANSIT" -> "Đang giao hàng";

@@ -4,15 +4,17 @@ import iuh.fit.xstore.dto.response.AppException;
 import iuh.fit.xstore.dto.response.ErrorCode;
 import iuh.fit.xstore.dto.response.StockProductResponse;
 import iuh.fit.xstore.dto.response.StockProductInfoResponse;
+import iuh.fit.xstore.model.Address;
+import iuh.fit.xstore.model.ProductInfo;
 import iuh.fit.xstore.model.Stock;
 import iuh.fit.xstore.model.StockItem;
+import iuh.fit.xstore.repository.ProductInfoRepository;
 import iuh.fit.xstore.repository.StockItemRepository;
 import iuh.fit.xstore.repository.StockRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import iuh.fit.xstore.repository.ProductInfoRepository;
-import iuh.fit.xstore.model.ProductInfo;
+import iuh.fit.xstore.repository.AddressRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class StockService {
     private final StockRepository stockRepo;
     private final StockItemRepository stockItemRepo;
     private final ProductInfoRepository productInfoRepo;
+    private final AddressRepository addressRepo;
 
     //Stock
     public List<Stock> findAll() {
@@ -43,7 +46,26 @@ public class StockService {
         s.setName(stock.getName());
         s.setPhone(stock.getPhone());
         s.setEmail(stock.getEmail());
-        s.setAddress(stock.getAddress());
+
+        // Update the existing address if it exists
+        if (stock.getAddress() != null) {
+            if (s.getAddress() != null) {
+                // Update existing address
+                Address existingAddress = s.getAddress();
+                Address newAddress = stock.getAddress();
+                existingAddress.setStreetNumber(newAddress.getStreetNumber());
+                existingAddress.setStreetName(newAddress.getStreetName());
+                existingAddress.setWard(newAddress.getWard());
+                existingAddress.setDistrict(newAddress.getDistrict());
+                existingAddress.setCity(newAddress.getCity());
+                addressRepo.save(existingAddress);
+            } else {
+                // Create new address if stock doesn't have one
+                Address savedAddress = addressRepo.save(stock.getAddress());
+                s.setAddress(savedAddress);
+            }
+        }
+
         return stockRepo.save(s);
     }
     public int delete(int id) {

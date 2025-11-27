@@ -39,6 +39,7 @@ public class SecurityConfig {
             "/api/ai/**",
             "/api/chat/user",
             "/api/stocks/**",
+            "/api/payment/**"
     };
 
     @Value("${jwt.key}")

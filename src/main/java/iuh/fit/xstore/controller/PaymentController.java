@@ -1,186 +1,128 @@
 package iuh.fit.xstore.controller;
 
-import iuh.fit.xstore.dto.response.ApiResponse;
-import iuh.fit.xstore.dto.response.SuccessCode;
+import iuh.fit.xstore.config.VNPayConfig;
 import iuh.fit.xstore.service.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller xử lý các callback từ các payment gateway
- * Hiện tại: CASH (thanh toán khi nhận hàng)
- * Tương lai: CARD, MOMO, ZALOPAY
- */
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 @RestController
 @RequestMapping("/api/payment")
 @AllArgsConstructor
-@Slf4j
 public class PaymentController {
     private final PaymentService paymentService;
-
-    /**
-     * Callback từ MoMo Payment Gateway
-     * POST /api/payment/momo-callback
-     */
-    @PostMapping("/momo-callback")
-    public ResponseEntity<ApiResponse<String>> momoCallback(
-            @RequestParam(required = false) String orderId,
-            @RequestParam(required = false) String transactionId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String message) {
-        
-        log.info("📱 MoMo Callback - OrderId: {}, TransactionId: {}, Status: {}", 
-                orderId, transactionId, status);
-
+    
+    @PostMapping("/create")
+    public ResponseEntity<Map<String, Object>> createPayment(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
         try {
-            // TODO: Validate callback signature từ MoMo
-            // if (!isValidMomoSignature(params)) { return error }
+            String vnp_Version = "2.1.0";
+            String vnp_Command = "pay";
+            String vnp_OrderInfo = (String) requestBody.get("vnp_OrderInfo");
+            String orderType = (String) requestBody.get("ordertype");
+            String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
+            String vnp_IpAddr = VNPayConfig.getIpAddress(request);
+            String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
 
-            // Xử lý MoMo callback
-            if ("0".equals(status)) { // Success
-                log.info("✅ MoMo payment successful for order: {}", orderId);
-                return ResponseEntity.ok(new ApiResponse<>(
-                        SuccessCode.PAYMENT_SUCCESSFUL.getCode(),
-                        "MoMo payment successful",
-                        "success"
-                ));
-            } else {
-                log.warn("❌ MoMo payment failed: {}", message);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ApiResponse<>(400, "MoMo payment failed: " + message, null)
-                );
+            int amount = ((Number) requestBody.get("amount")).intValue() * 100;
+            Map<String, String> vnp_Params = new HashMap<>();
+            vnp_Params.put("vnp_Version", vnp_Version);
+            vnp_Params.put("vnp_Command", vnp_Command);
+            vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+            vnp_Params.put("vnp_Amount", String.valueOf(amount));
+            vnp_Params.put("vnp_CurrCode", "VND");
+
+            String bank_code = (String) requestBody.get("bankcode");
+            if (bank_code != null && !bank_code.isEmpty()) {
+                vnp_Params.put("vnp_BankCode", bank_code);
             }
-        } catch (Exception e) {
-            log.error("❌ Error processing MoMo callback: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ApiResponse<>(500, "Error processing MoMo callback", null)
-            );
-        }
-    }
+            vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+            vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
+            vnp_Params.put("vnp_OrderType", orderType);
 
-    /**
-     * Callback từ ZaloPay Payment Gateway
-     * POST /api/payment/zalopay-callback
-     */
-    @PostMapping("/zalopay-callback")
-    public ResponseEntity<ApiResponse<String>> zalopayCallback(
-            @RequestParam(required = false) String orderId,
-            @RequestParam(required = false) String transactionId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String message) {
-        
-        log.info("📱 ZaloPay Callback - OrderId: {}, TransactionId: {}, Status: {}", 
-                orderId, transactionId, status);
-
-        try {
-            // TODO: Validate callback signature từ ZaloPay
-            // if (!isValidZaloPaySignature(params)) { return error }
-
-            // Xử lý ZaloPay callback
-            if ("1".equals(status)) { // Success
-                log.info("✅ ZaloPay payment successful for order: {}", orderId);
-                return ResponseEntity.ok(new ApiResponse<>(
-                        SuccessCode.PAYMENT_SUCCESSFUL.getCode(),
-                        "ZaloPay payment successful",
-                        "success"
-                ));
+            String locate = (String) requestBody.get("language");
+            if (locate != null && !locate.isEmpty()) {
+                vnp_Params.put("vnp_Locale", locate);
             } else {
-                log.warn("❌ ZaloPay payment failed: {}", message);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ApiResponse<>(400, "ZaloPay payment failed: " + message, null)
-                );
+                vnp_Params.put("vnp_Locale", "vn");
             }
+            vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_Returnurl);
+            vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            String vnp_CreateDate = formatter.format(cld.getTime());
+            vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+
+            cld.add(Calendar.MINUTE, 15);
+            String vnp_ExpireDate = formatter.format(cld.getTime());
+            vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+
+            // Billing (optional)
+            if (requestBody.containsKey("txt_billing_mobile")) {
+                vnp_Params.put("vnp_Bill_Mobile", (String) requestBody.get("txt_billing_mobile"));
+            }
+            if (requestBody.containsKey("txt_billing_email")) {
+                vnp_Params.put("vnp_Bill_Email", (String) requestBody.get("txt_billing_email"));
+            }
+            String fullName = (String) requestBody.get("txt_billing_fullname");
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                fullName = fullName.trim();
+                int idx = fullName.indexOf(' ');
+                if (idx > 0) {
+                    String firstName = fullName.substring(0, idx);
+                    String lastName = fullName.substring(fullName.lastIndexOf(' ') + 1);
+                    vnp_Params.put("vnp_Bill_FirstName", firstName);
+                    vnp_Params.put("vnp_Bill_LastName", lastName);
+                }
+            }
+            // Add other billing fields if needed
+
+            // Build data to hash and querystring
+            List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+            Collections.sort(fieldNames);
+            StringBuilder hashData = new StringBuilder();
+            StringBuilder query = new StringBuilder();
+            Iterator<String> itr = fieldNames.iterator();
+            while (itr.hasNext()) {
+                String fieldName = itr.next();
+                String fieldValue = vnp_Params.get(fieldName);
+                if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                    // Build hash data
+                    hashData.append(fieldName);
+                    hashData.append('=');
+                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    // Build query
+                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                    query.append('=');
+                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (itr.hasNext()) {
+                        query.append('&');
+                        hashData.append('&');
+                    }
+                }
+            }
+            String queryUrl = query.toString();
+            String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
+            queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+            String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", "00");
+            response.put("message", "success");
+            response.put("data", paymentUrl);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("❌ Error processing ZaloPay callback: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ApiResponse<>(500, "Error processing ZaloPay callback", null)
-            );
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("code", "01");
+            errorResponse.put("message", "Error creating payment: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
-    }
-
-    /**
-     * Redirect từ MoMo sau khi user hoàn thành thanh toán
-     * GET /api/payment/momo/redirect?orderId=123&returnUrl=...
-     */
-    @GetMapping("/momo/redirect")
-    public ResponseEntity<?> momoRedirect(
-            @RequestParam int orderId,
-            @RequestParam String returnUrl) {
-        
-        log.info("🔄 MoMo Redirect - OrderId: {}, ReturnUrl: {}", orderId, returnUrl);
-
-        try {
-            // TODO: Verify MoMo transaction status
-            // boolean isPaid = momoService.verifyTransaction(orderId);
-            
-            // Tạm thời redirect trực tiếp
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .header("Location", returnUrl + "?orderId=" + orderId)
-                    .build();
-        } catch (Exception e) {
-            log.error("❌ Error in MoMo redirect: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(500, "Error processing MoMo redirect", null));
-        }
-    }
-
-    /**
-     * Redirect từ ZaloPay sau khi user hoàn thành thanh toán
-     * GET /api/payment/zalopay/redirect?orderId=123&returnUrl=...
-     */
-    @GetMapping("/zalopay/redirect")
-    public ResponseEntity<?> zalopayRedirect(
-            @RequestParam int orderId,
-            @RequestParam String returnUrl) {
-        
-        log.info("🔄 ZaloPay Redirect - OrderId: {}, ReturnUrl: {}", orderId, returnUrl);
-
-        try {
-            // TODO: Verify ZaloPay transaction status
-            // boolean isPaid = zalopayService.verifyTransaction(orderId);
-            
-            // Tạm thời redirect trực tiếp
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .header("Location", returnUrl + "?orderId=" + orderId)
-                    .build();
-        } catch (Exception e) {
-            log.error("❌ Error in ZaloPay redirect: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(500, "Error processing ZaloPay redirect", null));
-        }
-    }
-
-    /**
-     * Health check endpoint
-     * GET /api/payment/health
-     */
-    @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> health() {
-        log.debug("🏥 Payment service health check");
-        return ResponseEntity.ok(new ApiResponse<>(
-                SuccessCode.SUCCESS.getCode(),
-                "Payment service is running",
-                "healthy"
-        ));
-    }
-
-    /**
-     * Webhook test endpoint
-     * POST /api/payment/test-webhook
-     */
-    @PostMapping("/test-webhook")
-    public ResponseEntity<ApiResponse<String>> testWebhook(
-            @RequestBody(required = false) String payload) {
-        
-        log.info("🧪 Test webhook called with payload: {}", payload);
-        
-        return ResponseEntity.ok(new ApiResponse<>(
-                SuccessCode.SUCCESS.getCode(),
-                "Webhook received successfully",
-                "test_ok"
-        ));
     }
 }

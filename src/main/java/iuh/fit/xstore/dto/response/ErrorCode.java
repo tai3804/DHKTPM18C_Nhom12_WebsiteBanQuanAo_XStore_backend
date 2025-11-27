@@ -86,6 +86,7 @@ public enum ErrorCode {
 
 //    ===validation===
     INVALID_REQUEST(400, "Invalid request"),
+    INVALID_TOKEN(401, "Invalid token"),
     UNAUTHORIZED(401, "Unauthorized"),
     FORBIDDEN(403, "Forbidden"),
 

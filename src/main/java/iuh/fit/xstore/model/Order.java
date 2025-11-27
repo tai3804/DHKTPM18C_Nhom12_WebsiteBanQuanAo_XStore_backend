@@ -31,6 +31,7 @@ public class Order {
     private LocalDate createdAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20, columnDefinition = "VARCHAR(20)")
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -109,11 +109,35 @@ public class UserService {
         User existedUser = userRepo.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        existedUser.setFirstName(user.getFirstName());
-        existedUser.setLastName(user.getLastName());
-        existedUser.setEmail(user.getEmail());
-        existedUser.setPhone(user.getPhone());
-        existedUser.setAvatar(user.getAvatar());
+        // Update profile fields only if provided (not null)
+        if (user.getFirstName() != null) {
+            existedUser.setFirstName(user.getFirstName());
+        }
+        if (user.getLastName() != null) {
+            existedUser.setLastName(user.getLastName());
+        }
+        if (user.getEmail() != null) {
+            existedUser.setEmail(user.getEmail());
+        }
+        if (user.getPhone() != null) {
+            existedUser.setPhone(user.getPhone());
+        }
+        if (user.getAvatar() != null) {
+            existedUser.setAvatar(user.getAvatar());
+        }
+
+        // Update user type and point if provided
+        if (user.getUserType() != null) {
+            existedUser.setUserType(user.getUserType());
+        }
+        if (user.getPoint() != 0 || (user.getPoint() == 0 && existedUser.getPoint() != 0)) {
+            existedUser.setPoint(user.getPoint());
+        }
+
+        // Update account role if provided
+        if (user.getRole() != null && existedUser.getAccount() != null) {
+            existedUser.getAccount().setRole(user.getRole());
+        }
 
         return userRepo.save(existedUser);
     }

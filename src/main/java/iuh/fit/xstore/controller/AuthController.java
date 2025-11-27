@@ -14,13 +14,15 @@ import iuh.fit.xstore.model.Cart;
 import iuh.fit.xstore.model.Role;
 import iuh.fit.xstore.model.User;
 import iuh.fit.xstore.repository.AccountRepository;
+import iuh.fit.xstore.repository.CartRepository;
 import iuh.fit.xstore.repository.UserRepository;
 import iuh.fit.xstore.security.UserDetail;
 import iuh.fit.xstore.service.JwtService;
 import iuh.fit.xstore.service.OtpService;
-import iuh.fit.xstore.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,13 +32,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@AllArgsConstructor
 public class AuthController {
 
     private final AccountRepository accountRepository;
@@ -45,6 +53,21 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     private JwtService jwtUtil;
     private OtpService otpService;
+    private final CartRepository cartRepository;
+
+    @Value("${google.client.id}")
+    private String googleClientId;
+
+    @Autowired
+    public AuthController(AccountRepository accountRepository, AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtUtil, OtpService otpService, CartRepository cartRepository) {
+        this.accountRepository = accountRepository;
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.otpService = otpService;
+        this.cartRepository = cartRepository;
+    }
 
     // (Giữ nguyên /login)
     @PostMapping("/login")
@@ -178,6 +201,75 @@ public class AuthController {
             return new ApiResponse<>(SuccessCode.OTP_VALID, data);
         } catch (Exception e) {
             log.error("Error verifying OTP: {}", e.getMessage());
+            return new ApiResponse<>(ErrorCode.UNKNOWN_ERROR);
+        }
+    }
+
+    @PostMapping("/google-login")
+    public ApiResponse<?> googleLogin(@RequestBody Map<String, String> request) {
+        try {
+            String token = request.get("token");
+            if (token == null || token.trim().isEmpty()) {
+                return new ApiResponse<>(ErrorCode.INVALID_INPUT);
+            }
+
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(token);
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                String email = payload.getEmail();
+                String name = (String) payload.get("name");
+
+                // Split name into first and last
+                String[] names = name.split(" ", 2);
+                String firstName = names[0];
+                String lastName = names.length > 1 ? names[1] : "";
+
+                // Check if user exists
+                Optional<User> existingUser = userRepository.findByEmail(email);
+                User user;
+                if (existingUser.isPresent()) {
+                    user = existingUser.get();
+                } else {
+                    // Create new user
+                    Account account = Account.builder()
+                            .username(email)
+                            .password(passwordEncoder.encode("defaultpassword")) // default password for OAuth users
+                            .role(Role.CUSTOMER)
+                            .build();
+                    account = accountRepository.save(account);
+
+                    Cart cart = Cart.builder()
+                            .total(0)
+                            .build();
+                    cart = cartRepository.save(cart);
+
+                    user = User.builder()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .email(email)
+                            .account(account)
+                            .cart(cart)
+                            .build();
+                    user = userRepository.save(user);
+                }
+
+                // Create JWT
+                UserDetail userDetail = new UserDetail(user.getAccount());
+                String jwt = jwtUtil.generateToken(userDetail);
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("token", jwt);
+                data.put("user", user);
+                return new ApiResponse<>(SuccessCode.LOGIN_SUCCESSFULLY, data);
+            } else {
+                return new ApiResponse<>(ErrorCode.INVALID_TOKEN);
+            }
+        } catch (Exception e) {
+            log.error("Error during Google login: {}", e.getMessage());
             return new ApiResponse<>(ErrorCode.UNKNOWN_ERROR);
         }
     }

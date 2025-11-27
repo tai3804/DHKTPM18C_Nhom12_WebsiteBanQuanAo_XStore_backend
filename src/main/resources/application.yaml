@@ -1,6 +1,13 @@
 jwt:
   key: ${SECRET_KEY}
 
+vnpay:
+  pay-url: ${VNP_URL}
+  return-url: ${VNP_RETURN_URL}
+  ipn-url: ${VNP_IPN_URL}
+  tmn-code: ${VNP_TMN_CODE}
+  hash-secret: ${VNP_HASH_SECRET}
+
 spring:
   application:
     name: XStore

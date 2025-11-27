@@ -34,9 +34,19 @@ public class RequestController {
                 SuccessCode.FETCH_SUCCESS.getMessage(), requests);
     }
 
-    // ========== ADMIN REQUESTS ==========
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
+    public ApiResponse<List<Request>> getRequests(@RequestParam(required = false) Integer orderId) {
+        List<Request> requests;
+        if (orderId != null) {
+            requests = requestService.findRequestsByOrder(orderId);
+        } else {
+            requests = requestService.findAllRequests();
+        }
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
+                SuccessCode.FETCH_SUCCESS.getMessage(), requests);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
     public ApiResponse<List<Request>> getAllRequests() {
         var requests = requestService.findAllRequests();
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),

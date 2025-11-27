@@ -28,6 +28,7 @@ public class PaymentService {
     private final UserRepository userRepo;
     private final ProductRepository productRepo;
     private final DiscountRepository discountRepo;
+    private final StockItemRepository stockItemRepo;
 
     /**
      * Xử lý checkout và tạo đơn hàng
@@ -64,7 +65,7 @@ public class PaymentService {
         Order order = Order.builder()
                 .user(user)
                 .createdAt(LocalDate.now())
-                .status(OrderStatus.PENDING)
+                .status(determineInitialStatus(request.getPaymentMethod()))
                 .paymentMethod(request.getPaymentMethod() != null ? 
                         request.getPaymentMethod() : "CASH")
                 .shippingAddress(request.getShippingAddress())
@@ -85,10 +86,17 @@ public class PaymentService {
 
             Product product = cartItem.getProduct();
 
-            // Kiểm tra stock (sử dụng priceInStock như tên field)
-            if (product.getPriceInStock() < cartItem.getQuantity()) {
-                log.error("❌ Insufficient stock for product: {} (Available: {}, Requested: {})", 
-                        product.getId(), product.getPriceInStock(), cartItem.getQuantity());
+            // Kiểm tra stock từ StockItem
+            StockItem stockItem = null;
+            if (cartItem.getStock() != null && cartItem.getProductInfo() != null) {
+                stockItem = stockItemRepo.findByStock_IdAndProductInfo_Id(
+                    cartItem.getStock().getId(), cartItem.getProductInfo().getId())
+                    .orElse(null);
+            }
+            
+            if (stockItem == null || stockItem.getQuantity() < cartItem.getQuantity()) {
+                log.error("❌ Insufficient stock for product variant: {} (Available: {}, Requested: {})", 
+                        product.getId(), stockItem != null ? stockItem.getQuantity() : 0, cartItem.getQuantity());
                 throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
             }
 
@@ -109,12 +117,19 @@ public class PaymentService {
             orderItems.add(orderItem);
             subtotal += itemSubtotal;
 
-            // Giảm tồn kho
-            product.setPriceInStock(product.getPriceInStock() - cartItem.getQuantity());
-            productRepo.save(product);
-            log.debug("📦 Stock updated for product {}: {} -> {}", 
-                    product.getId(), product.getPriceInStock() + cartItem.getQuantity(), 
-                    product.getPriceInStock());
+            // Trừ stock ngay khi đặt hàng
+            if (stockItem != null) {
+                stockItem.setQuantity(stockItem.getQuantity() - cartItem.getQuantity());
+                stockItemRepo.save(stockItem);
+                log.debug("📦 Stock updated for variant {}: -{}", 
+                        stockItem.getId(), cartItem.getQuantity());
+            } else {
+                // Fallback: trừ từ product stock
+                product.setPriceInStock(product.getPriceInStock() - cartItem.getQuantity());
+                productRepo.save(product);
+                log.debug("📦 Fallback stock updated for product {}: -{}", 
+                        product.getId(), cartItem.getQuantity());
+            }
         }
 
         if (orderItems.isEmpty()) {
@@ -241,6 +256,23 @@ public class PaymentService {
     }
 
     /**
+     * Xác định trạng thái ban đầu của đơn hàng dựa trên phương thức thanh toán
+     */
+    private OrderStatus determineInitialStatus(String paymentMethod) {
+        if (paymentMethod == null) return OrderStatus.PENDING;
+
+        String method = paymentMethod.toUpperCase();
+        switch (method) {
+            case "VNPAY":
+            case "CARD":
+                return OrderStatus.AWAITING_PAYMENT; // Chờ thanh toán
+            case "CASH":
+            default:
+                return OrderStatus.PENDING; // Chờ xác nhận
+        }
+    }
+
+    /**
      * Tính phí vận chuyển dựa trên địa chỉ
      * Quy tắc: 
      * - TP.HCM = 25.000₫
@@ -301,8 +333,9 @@ public class PaymentService {
 
         try {
             switch (method) {
-                case "CASH":
-                    return processCashPayment(order);
+                case "VNPAY":
+                    log.info("💳 Processing VNPAY payment for order: {}", order.getId());
+                    return processVNPayPayment(order);
                 
                 case "CARD":
                     log.warn("⚠️ CARD payment is not yet implemented");
@@ -335,12 +368,29 @@ public class PaymentService {
     private boolean processCashPayment(Order order) {
         try {
             log.info("💵 Processing CASH payment for order: {}", order.getId());
+            // Stock đã được trừ khi tạo order, chỉ cần cập nhật trạng thái
             order.setStatus(OrderStatus.CONFIRMED);
             orderRepo.save(order);
             log.info("✅ CASH payment confirmed for order: {}", order.getId());
             return true;
         } catch (Exception e) {
             log.error("❌ Error processing CASH payment: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Xử lý thanh toán VNPay
+     * Đơn hàng đã được set trạng thái AWAITING_PAYMENT trong processCheckout
+     */
+    private boolean processVNPayPayment(Order order) {
+        try {
+            log.info("💳 Processing VNPAY payment for order: {}", order.getId());
+            // Đơn hàng đã ở trạng thái AWAITING_PAYMENT, chỉ cần log
+            log.info("✅ VNPAY payment initiated for order: {}", order.getId());
+            return true;
+        } catch (Exception e) {
+            log.error("❌ Error processing VNPAY payment: {}", e.getMessage());
             return false;
         }
     }
@@ -377,6 +427,37 @@ public class PaymentService {
             return true;
         } catch (Exception e) {
             log.error("❌ Error processing MOMO payment: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Xác nhận thanh toán VNPay thành công
+     * Cập nhật trạng thái đơn hàng thành PENDING (chờ xác nhận)
+     * Stock đã được trừ khi tạo order
+     */
+    @Transactional
+    public boolean confirmVNPayPayment(int orderId) {
+        try {
+            log.info("💳 Confirming VNPAY payment for order: {}", orderId);
+            
+            Order order = orderRepo.findById(orderId)
+                    .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+            
+            // Kiểm tra trạng thái
+            if (!order.getStatus().equals(OrderStatus.AWAITING_PAYMENT)) {
+                log.warn("⚠️ Order {} is not in AWAITING_PAYMENT status: {}", orderId, order.getStatus());
+                return false;
+            }
+            
+            // Stock đã được trừ khi tạo order, chỉ cần cập nhật trạng thái thành PENDING (chờ xác nhận)
+            order.setStatus(OrderStatus.PENDING);
+            orderRepo.save(order);
+            
+            log.info("✅ VNPAY payment confirmed for order: {} - Status set to PENDING", orderId);
+            return true;
+        } catch (Exception e) {
+            log.error("❌ Error confirming VNPAY payment for order {}: {}", orderId, e.getMessage());
             return false;
         }
     }
@@ -438,7 +519,8 @@ public class PaymentService {
 
         // Kiểm tra trạng thái
         if (!order.getStatus().equals(OrderStatus.PENDING) &&
-            !order.getStatus().equals(OrderStatus.CONFIRMED)) {
+            !order.getStatus().equals(OrderStatus.CONFIRMED) &&
+            !order.getStatus().equals(OrderStatus.AWAITING_PAYMENT)) {
             log.error("❌ Cannot cancel order {} with status: {}", orderId, order.getStatus());
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
@@ -451,12 +533,36 @@ public class PaymentService {
                     continue;
                 }
 
-                Product product = item.getProduct();
-                product.setPriceInStock(product.getPriceInStock() + item.getQuantity());
-                productRepo.save(product);
+                // Tìm StockItem dựa trên color và size từ OrderItem
+                StockItem stockItem = null;
+                if (item.getColor() != null && item.getSize() != null) {
+                    // Tìm ProductInfo có color và size tương ứng
+                    ProductInfo productInfo = item.getProduct().getProductInfos().stream()
+                        .filter(pi -> item.getColor().equals(pi.getColorName()) && 
+                                     item.getSize().equals(pi.getSizeName()))
+                        .findFirst().orElse(null);
+                    
+                    if (productInfo != null) {
+                        // Giả sử stock đầu tiên
+                        if (!productInfo.getStockItems().isEmpty()) {
+                            stockItem = productInfo.getStockItems().get(0);
+                        }
+                    }
+                }
                 
-                log.debug("📦 Stock restored for product {}: +{}", 
-                        product.getId(), item.getQuantity());
+                if (stockItem != null) {
+                    stockItem.setQuantity(stockItem.getQuantity() + item.getQuantity());
+                    stockItemRepo.save(stockItem);
+                    log.debug("📦 Stock restored for variant {}: +{}", 
+                            stockItem.getId(), item.getQuantity());
+                } else {
+                    // Fallback: hoàn lại product stock
+                    Product product = item.getProduct();
+                    product.setPriceInStock(product.getPriceInStock() + item.getQuantity());
+                    productRepo.save(product);
+                    log.debug("📦 Fallback stock restored for product {}: +{}", 
+                            product.getId(), item.getQuantity());
+                }
             }
         }
 

@@ -44,7 +44,9 @@ public class RequestService {
 
         // Kiểm tra trạng thái đơn hàng phù hợp
         if (request.getType() == RequestType.CANCEL) {
-            if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
+            if (order.getStatus() != OrderStatus.PENDING &&
+                order.getStatus() != OrderStatus.CONFIRMED &&
+                order.getStatus() != OrderStatus.AWAITING_PAYMENT) {
                 throw new AppException(ErrorCode.INVALID_REQUEST);
             }
         } else if (request.getType() == RequestType.RETURN) {

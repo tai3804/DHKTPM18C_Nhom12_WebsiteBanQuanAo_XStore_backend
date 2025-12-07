@@ -24,5 +24,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceHandler("/comments/**")
                 .addResourceLocations("file:uploads/comments/")
                 .setCachePeriod(3600);  // Cache 1 giờ
+
+        // Serve avatar files từ uploads/avatars/ directory
+        registry
+                .addResourceHandler("/avatars/**")
+                .addResourceLocations("file:uploads/avatars/")
+                .setCachePeriod(3600);  // Cache 1 giờ
     }
 }

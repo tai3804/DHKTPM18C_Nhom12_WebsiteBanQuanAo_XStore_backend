@@ -177,4 +177,82 @@ public class UserService {
         // 6. Lưu lại vào database
         accountRepo.save(account);
     }
+
+    /**
+     * Cập nhật điểm thành viên sau khi mua hàng
+     * Quy tắc: Mỗi 1000₫ = 1 điểm
+     * Xếp hạng:
+     * - COPPER (Đồng): 0 - 99 điểm
+     * - SILVER (Bạc): 100 - 199 điểm
+     * - GOLD (Vàng): 200 - 499 điểm
+     * - PLATINUM (Bạch kim): >= 500 điểm (không tích điểm nữa)
+     */
+    public void updatePointsAndRank(int userId, double orderTotal) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Nếu đã là PLATINUM thì không tích điểm nữa
+        if (user.getUserType() == UserType.PLATINUM) {
+            log.info("✨ User {} is already PLATINUM, no points added", userId);
+            return;
+        }
+
+        // Tính điểm mới: Mỗi 1000₫ = 1 điểm
+        int pointsToAdd = (int) (orderTotal / 1000);
+        int currentPoints = user.getPoint();
+        int newPoints = currentPoints + pointsToAdd;
+
+        // Xác định hạng mới
+        UserType newRank = determineUserRank(newPoints);
+        UserType oldRank = user.getUserType();
+
+        // Cập nhật điểm và hạng
+        user.setPoint(newPoints);
+        user.setUserType(newRank);
+        userRepo.save(user);
+
+        log.info("🎯 User {} earned {} points (Total: {} points) | Rank: {} -> {}", 
+                userId, pointsToAdd, newPoints, oldRank, newRank);
+    }
+
+    /**
+     * Xác định hạng thành viên dựa trên tổng điểm
+     */
+    private UserType determineUserRank(int points) {
+        if (points >= 500) {
+            return UserType.PLATINUM; // Bạch kim: >= 500 điểm
+        } else if (points >= 200) {
+            return UserType.GOLD;     // Vàng: 200-499 điểm
+        } else if (points >= 100) {
+            return UserType.SILVER;   // Bạc: 100-199 điểm
+        } else {
+            return UserType.COPPER;   // Đồng: 0-99 điểm
+        }
+    }
+
+    /**
+     * Đếm số khách hàng mới trong khoảng thời gian
+     * @param period "day", "month", hoặc "year"
+     * @return số lượng khách hàng mới
+     */
+    public long getNewCustomersCount(String period) {
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        java.time.LocalDateTime startDate;
+        java.time.LocalDateTime endDate = now;
+
+        switch (period.toLowerCase()) {
+            case "day":
+                startDate = now.toLocalDate().atStartOfDay();
+                break;
+            case "year":
+                startDate = java.time.LocalDateTime.of(now.getYear(), 1, 1, 0, 0);
+                break;
+            case "month":
+            default:
+                startDate = java.time.LocalDateTime.of(now.getYear(), now.getMonth(), 1, 0, 0);
+                break;
+        }
+
+        return userRepo.countNewCustomersBetween(startDate, endDate);
+    }
 }

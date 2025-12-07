@@ -29,6 +29,7 @@ public class PaymentService {
     private final ProductRepository productRepo;
     private final DiscountRepository discountRepo;
     private final StockItemRepository stockItemRepo;
+    private final UserService userService;
 
     /**
      * Xử lý checkout và tạo đơn hàng
@@ -249,7 +250,15 @@ public class PaymentService {
         log.info("✅ Order created successfully: Order #{} | Subtotal: {}₫ | Discount: {}₫ | Shipping: {}₫ | Total: {}₫", 
                 savedOrder.getId(), subtotal, discountAmount, shippingFee, total);
 
-        // 9. Xóa giỏ hàng
+        // 9. Cập nhật điểm và xếp hạng thành viên
+        try {
+            userService.updatePointsAndRank(user.getId(), total);
+        } catch (Exception e) {
+            log.warn("⚠️ Failed to update user points and rank: {}", e.getMessage());
+            // Không throw exception để không ảnh hưởng đến quá trình tạo đơn hàng
+        }
+
+        // 10. Xóa giỏ hàng
         clearCart(request.getCartId());
 
         return savedOrder;

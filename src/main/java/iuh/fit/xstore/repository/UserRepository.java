@@ -35,4 +35,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User>  findByPhone(String phone);
 
     boolean existsByEmail(String email);
+
+    // Đếm số khách hàng mới trong khoảng thời gian
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt < :endDate")
+    long countNewCustomersBetween(@Param("startDate") java.time.LocalDateTime startDate, 
+                                   @Param("endDate") java.time.LocalDateTime endDate);
 }

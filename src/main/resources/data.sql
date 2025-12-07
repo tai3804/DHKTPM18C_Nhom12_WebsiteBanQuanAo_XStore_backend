@@ -47,61 +47,53 @@ INSERT IGNORE INTO stocks (id, name, phone, email, address_id) VALUES
 (1, 'Kho Miền Bắc - Hà Nội', '0243.456.789', 'hanoi@xstore.vn', null),
 (2, 'Kho Miền Nam - TP.HCM', '0283.456.789', 'hcm@xstore.vn', null),
 (3, 'Kho Miền Trung - Đà Nẵng', '0236.456.789', 'danang@xstore.vn', null),
-(4, 'Kho Miền Tây - Cần Thơ', '0292.456.789', 'cantho@xstore.vn', null),
-(5, 'Kho Đông Nam Bộ - Bình Dương', '0274.456.789', 'binhduong@xstore.vn', null);
 
 -- Insert product types (danh mục sản phẩm)
 INSERT IGNORE INTO product_types (id, name, description) VALUES
-(1, 'Áo Nam', 'Các loại áo dành cho nam giới'),
-(2, 'Áo Nữ', 'Các loại áo dành cho nữ giới'),
-(3, 'Quần Nam', 'Quần dài, quần short nam'),
-(4, 'Quần Nữ', 'Quần dài, chân váy nữ'),
-(5, 'Giày Dép', 'Giày thể thao, sandal, boot'),
-(6, 'Phụ Kiện', 'Túi xách, nón, thắt lưng');
+(1, 'Đồ Nam', 'Quần áo và trang phục dành cho nam giới'),
+(2, 'Đồ Nữ', 'Quần áo và trang phục dành cho nữ giới'),
+(3, 'Phụ Kiện', 'Giày dép, túi xách, nón, thắt lưng và các phụ kiện khác');
 
 -- Insert sample products với ảnh thật từ Unsplash
 INSERT IGNORE INTO products (id, name, description, image, product_type_id, brand, fabric, price_in_stock, price) VALUES
--- Áo Nam
+-- Đồ Nam
 (1, 'Áo Thun Nam Basic Cotton', 'Áo thun nam basic chất liệu cotton 100%, form regular fit thoải mái. Phù hợp mặc hàng ngày, đi chơi hay đi làm.', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400', 1, 'X-Store', 'Cotton 100%', 120000, 179000),
 
 (2, 'Áo Sơ Mi Nam Công Sở', 'Áo sơ mi nam công sở chất vải cotton pha, form slim fit hiện đại. Thiết kế lịch lãm, phù hợp môi trường công sở.', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400', 1, 'X-Store', 'Cotton Blend', 280000, 399000),
 
 (3, 'Áo Hoodie Nam Streetwear', 'Áo hoodie nam phong cách streetwear, chất nỉ cotton dày dặn. Form oversize trendy với hood và túi kangaroo.', 'https://images.unsplash.com/photo-1556821840-3a9fbc86339e?w=400', 1, 'X-Store', 'Cotton Fleece', 350000, 499000),
 
--- Áo Nữ
+-- Đồ Nữ
 (4, 'Áo Thun Nữ Crop Top', 'Áo thun nữ crop top trendy chất cotton co giãn. Form fitted ôm dáng, phù hợp mix đồ năng động.', 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=400', 2, 'X-Store', 'Cotton Spandex', 140000, 199000),
 
 (5, 'Áo Blouse Nữ Công Sở', 'Áo blouse nữ công sở chất vải lụa mềm mại. Thiết kế thanh lịch với tay bồng nhẹ, phù hợp đi làm.', 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400', 2, 'X-Store', 'Polyester Silk', 320000, 459000),
 
 (6, 'Áo Khoác Blazer Nữ', 'Áo khoác blazer nữ form fitted sang trọng. Chất vải polyester cao cấp, thiết kế 1 button hiện đại.', 'https://images.unsplash.com/photo-1591369823-a8e19c5f06d6?w=400', 2, 'X-Store', 'Polyester Premium', 450000, 649000),
 
--- Quần Nam
-(7, 'Quần Jeans Nam Slim Fit', 'Quần jeans nam slim fit chất denim cotton co giãn. Wash nhẹ tự nhiên, phom dáng ôm vừa phải.', 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', 3, 'X-Store', 'Denim Cotton', 380000, 549000),
+(7, 'Quần Jeans Nam Slim Fit', 'Quần jeans nam slim fit chất denim cotton co giãn. Wash nhẹ tự nhiên, phom dáng ôm vừa phải.', 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', 1, 'X-Store', 'Denim Cotton', 380000, 549000),
 
-(8, 'Quần Kaki Nam Chinos', 'Quần kaki nam chinos chất cotton twill mềm mại. Form straight leg thoải mái, phù hợp nhiều dịp.', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400', 3, 'X-Store', 'Cotton Twill', 290000, 419000),
+(8, 'Quần Kaki Nam Chinos', 'Quần kaki nam chinos chất cotton twill mềm mại. Form straight leg thoải mái, phù hợp nhiều dịp.', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400', 1, 'X-Store', 'Cotton Twill', 290000, 419000),
 
-(9, 'Quần Short Nam Thể Thao', 'Quần short nam thể thao chất polyester thấm hút mồ hôi. Có lót bên trong và túi zip tiện lợi.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 3, 'X-Store', 'Polyester DryFit', 180000, 259000),
+(9, 'Quần Short Nam Thể Thao', 'Quần short nam thể thao chất polyester thấm hút mồ hôi. Có lót bên trong và túi zip tiện lợi.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 1, 'X-Store', 'Polyester DryFit', 180000, 259000),
 
--- Quần Nữ
-(10, 'Quần Jeans Nữ Skinny', 'Quần jeans nữ skinny fit ôm dáng hoàn hảo. Chất denim co giãn 4 chiều, tôn lên đường cong cơ thể.', 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400', 4, 'X-Store', 'Denim Stretch', 420000, 599000),
+(10, 'Quần Jeans Nữ Skinny', 'Quần jeans nữ skinny fit ôm dáng hoàn hảo. Chất denim co giãn 4 chiều, tôn lên đường cong cơ thể.', 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400', 2, 'X-Store', 'Denim Stretch', 420000, 599000),
 
-(11, 'Chân Váy Chữ A Vintage', 'Chân váy chữ A vintage chất vải cotton pha. Thiết kế xoè nhẹ, độ dài qua gối thanh lịch.', 'https://images.unsplash.com/photo-1583496661160-fb5886a13d75?w=400', 4, 'X-Store', 'Cotton Blend', 250000, 359000),
+(11, 'Chân Váy Chữ A Vintage', 'Chân váy chữ A vintage chất vải cotton pha. Thiết kế xoè nhẹ, độ dài qua gối thanh lịch.', 'https://images.unsplash.com/photo-1583496661160-fb5886a13d75?w=400', 2, 'X-Store', 'Cotton Blend', 250000, 359000),
 
-(12, 'Quần Culottes Nữ Wide Leg', 'Quần culottes nữ wide leg thời thưởng. Chất vải polyester mềm mát, phù hợp thời tiết nóng.', 'https://images.unsplash.com/photo-1571513722275-4b8c0215cd62?w=400', 4, 'X-Store', 'Polyester Crepe', 330000, 479000),
-
--- Giày Dép
-(13, 'Giày Sneaker Nam Basic', 'Giày sneaker nam basic phong cách minimalist. Upper da synthetic bền bỉ, đế rubber chống trượt.', 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400', 5, 'X-Store', 'Synthetic Leather', 580000, 799000),
-
-(14, 'Giày Boot Nữ Chelsea', 'Giày boot nữ chelsea cổ điển. Chất da PU cao cấp, gót cao 5cm thanh lịch và thoải mái.', 'https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400', 5, 'X-Store', 'PU Leather', 650000, 899000),
-
-(15, 'Sandal Nữ Đế Xuồng', 'Sandal nữ đế xuồng phong cách bohemian. Quai ngang mềm mại, đế cao 7cm ổn định.', 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400', 5, 'X-Store', 'Synthetic', 320000, 459000),
+(12, 'Quần Culottes Nữ Wide Leg', 'Quần culottes nữ wide leg thời thượng. Chất vải polyester mềm mát, phù hợp thời tiết nóng.', 'https://images.unsplash.com/photo-1571513722275-4b8c0215cd62?w=400', 2, 'X-Store', 'Polyester Crepe', 330000, 479000),
 
 -- Phụ Kiện
-(16, 'Túi Tote Canvas Unisex', 'Túi tote canvas unisex phong cách vintage. Chất canvas dày bền, size vừa phải đựng đồ hàng ngày.', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400', 6, 'X-Store', 'Canvas', 180000, 259000),
+(13, 'Giày Sneaker Nam Basic', 'Giày sneaker nam basic phong cách minimalist. Upper da synthetic bền bỉ, đế rubber chống trượt.', 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400', 3, 'X-Store', 'Synthetic Leather', 580000, 799000),
 
-(17, 'Nón Snapback Streetwear', 'Nón snapback streetwear chất cotton twill. Logo thêu nổi 3D, viền nón cong phong cách Mỹ.', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400', 6, 'X-Store', 'Cotton Twill', 150000, 219000),
+(14, 'Giày Boot Nữ Chelsea', 'Giày boot nữ chelsea cổ điển. Chất da PU cao cấp, gót cao 5cm thanh lịch và thoải mái.', 'https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400', 3, 'X-Store', 'PU Leather', 650000, 899000),
 
-(18, 'Thắt Lưng Da Nam', 'Thắt lưng da nam genuine leather. Mặt khóa kim loại cao cấp, thiết kế cổ điển sang trọng.', 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=400', 6, 'X-Store', 'Genuine Leather', 290000, 419000);
+(15, 'Sandal Nữ Đế Xuồng', 'Sandal nữ đế xuồng phong cách bohemian. Quai ngang mềm mại, đế cao 7cm ổn định.', 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400', 3, 'X-Store', 'Synthetic', 320000, 459000),
+
+(16, 'Túi Tote Canvas Unisex', 'Túi tote canvas unisex phong cách vintage. Chất canvas dày bền, size vừa phải đựng đồ hàng ngày.', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400', 3, 'X-Store', 'Canvas', 180000, 259000),
+
+(17, 'Nón Snapback Streetwear', 'Nón snapback streetwear chất cotton twill. Logo thêu nổi 3D, viền nón cong phong cách Mỹ.', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400', 3, 'X-Store', 'Cotton Twill', 150000, 219000),
+
+(18, 'Thắt Lưng Da Nam', 'Thắt lưng da nam genuine leather. Mặt khóa kim loại cao cấp, thiết kế cổ điển sang trọng.', 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=400', 3, 'X-Store', 'Genuine Leather', 290000, 419000);
 
 -- Insert product_info (thông tin biến thể: color, size, quantity)
 INSERT IGNORE INTO product_info (id, product_id, color_name, color_hex_code, size_name, image) VALUES
@@ -411,7 +403,7 @@ INSERT IGNORE INTO stock_items (id, stock_id, product_info_id, quantity) VALUES
 
 -- Reset AUTO_INCREMENT
 ALTER TABLE stocks AUTO_INCREMENT = 6;
-ALTER TABLE product_types AUTO_INCREMENT = 7;
+ALTER TABLE product_types AUTO_INCREMENT = 4;
 ALTER TABLE products AUTO_INCREMENT = 51;
 ALTER TABLE product_info AUTO_INCREMENT = 481;
 ALTER TABLE stock_items AUTO_INCREMENT = 61;
@@ -457,31 +449,31 @@ INSERT IGNORE INTO products (id, name, description, image, product_type_id, bran
 (31, 'Áo Vest Nữ', 'Áo vest nữ công sở chất vải tweed. Thiết kế không khuy, form fitted.', 'https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=400', 2, 'X-Store', 'Tweed', 480000, 689000),
 (32, 'Áo Tank Top Nữ', 'Áo tank top nữ chất modal thoáng mát. Form fitted, phù hợp layering.', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400', 2, 'X-Store', 'Modal', 140000, 199000),
 
--- Quần Nam (33-36)
-(33, 'Quần Jogger Nam', 'Quần jogger nam thể thao chất cotton pha. Ống bo gấu, túi zip tiện lợi.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 3, 'X-Store', 'Cotton Blend', 280000, 399000),
-(34, 'Quần Cargo Nam', 'Quần cargo nam nhiều túi chất cotton canvas. Form straight leg rugged.', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400', 3, 'X-Store', 'Canvas', 350000, 499000),
-(35, 'Quần Tây Nam Công Sở', 'Quần tây nam công sở chất wool pha. Form slim fit lịch lãm.', 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', 3, 'X-Store', 'Wool Blend', 420000, 599000),
-(36, 'Quần Ống Rộng Nam', 'Quần ống rộng nam chất linen thoáng mát. Form wide leg bohemian.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 3, 'X-Store', 'Linen', 320000, 459000),
+-- Quần Nam (33-36) - Đồ Nam
+(33, 'Quần Jogger Nam', 'Quần jogger nam thể thao chất cotton pha. Ống bo gấu, túi zip tiện lợi.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 1, 'X-Store', 'Cotton Blend', 280000, 399000),
+(34, 'Quần Cargo Nam', 'Quần cargo nam nhiều túi chất cotton canvas. Form straight leg rugged.', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400', 1, 'X-Store', 'Canvas', 350000, 499000),
+(35, 'Quần Tây Nam Công Sở', 'Quần tây nam công sở chất wool pha. Form slim fit lịch lãm.', 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', 1, 'X-Store', 'Wool Blend', 420000, 599000),
+(36, 'Quần Ống Rộng Nam', 'Quần ống rộng nam chất linen thoáng mát. Form wide leg bohemian.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 1, 'X-Store', 'Linen', 320000, 459000),
 
--- Quần Nữ (37-40)
-(37, 'Quần Legging Nữ', 'Quần legging nữ thể thao chất spandex co giãn. Form ôm sát, thấm hút mồ hôi.', 'https://images.unsplash.com/photo-1583496661160-fb5886a13d75?w=400', 4, 'X-Store', 'Spandex', 220000, 319000),
-(38, 'Quần Tây Nữ', 'Quần tây nữ công sở chất gabardine. Form straight leg thanh lịch.', 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400', 4, 'X-Store', 'Gabardine', 380000, 549000),
-(39, 'Quần Short Nữ', 'Quần short nữ chất denim co giãn. Form high waist trendy.', 'https://images.unsplash.com/photo-1571513722275-4b8c0215cd62?w=400', 4, 'X-Store', 'Denim', 240000, 349000),
-(40, 'Quần Jogger Nữ', 'Quần jogger nữ thể thao chất polyester. Ống bo gấu, dây rút eo.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 4, 'X-Store', 'Polyester', 260000, 379000),
+-- Quần Nữ (37-40) - Đồ Nữ
+(37, 'Quần Legging Nữ', 'Quần legging nữ thể thao chất spandex co giãn. Form ôm sát, thấm hút mồ hôi.', 'https://images.unsplash.com/photo-1583496661160-fb5886a13d75?w=400', 2, 'X-Store', 'Spandex', 220000, 319000),
+(38, 'Quần Tây Nữ', 'Quần tây nữ công sở chất gabardine. Form straight leg thanh lịch.', 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400', 2, 'X-Store', 'Gabardine', 380000, 549000),
+(39, 'Quần Short Nữ', 'Quần short nữ chất denim co giãn. Form high waist trendy.', 'https://images.unsplash.com/photo-1571513722275-4b8c0215cd62?w=400', 2, 'X-Store', 'Denim', 240000, 349000),
+(40, 'Quần Jogger Nữ', 'Quần jogger nữ thể thao chất polyester. Ống bo gấu, dây rút eo.', 'https://images.unsplash.com/photo-1506629905607-0667baa7b8b1?w=400', 2, 'X-Store', 'Polyester', 260000, 379000),
 
--- Giày Dép (41-44)
-(41, 'Giày Lười Nam Loafers', 'Giày lười nam loafers da thật. Thiết kế penny slot cổ điển.', 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400', 5, 'X-Store', 'Genuine Leather', 650000, 899000),
-(42, 'Giày Cao Gót Nữ Pumps', 'Giày cao gót nữ pumps da PU. Gót 8cm thanh lịch, mũi nhọn.', 'https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400', 5, 'X-Store', 'PU Leather', 480000, 689000),
-(43, 'Giày Thể Thao Unisex', 'Giày thể thao unisex chất mesh thoáng khí. Đế EVA êm ái.', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400', 5, 'X-Store', 'Mesh', 420000, 599000),
-(44, 'Sandal Nam Flip Flops', 'Sandal nam flip flops chất EVA nhẹ nhàng. Thiết kế đơn giản, dễ chịu.', 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400', 5, 'X-Store', 'EVA', 120000, 179000),
+-- Giày Dép (41-44) - Phụ Kiện
+(41, 'Giày Lười Nam Loafers', 'Giày lười nam loafers da thật. Thiết kế penny slot cổ điển.', 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400', 3, 'X-Store', 'Genuine Leather', 650000, 899000),
+(42, 'Giày Cao Gót Nữ Pumps', 'Giày cao gót nữ pumps da PU. Gót 8cm thanh lịch, mũi nhọn.', 'https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400', 3, 'X-Store', 'PU Leather', 480000, 689000),
+(43, 'Giày Thể Thao Unisex', 'Giày thể thao unisex chất mesh thoáng khí. Đế EVA êm ái.', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400', 3, 'X-Store', 'Mesh', 420000, 599000),
+(44, 'Sandal Nam Flip Flops', 'Sandal nam flip flops chất EVA nhẹ nhàng. Thiết kế đơn giản, dễ chịu.', 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400', 3, 'X-Store', 'EVA', 120000, 179000),
 
 -- Phụ Kiện (45-50)
-(45, 'Túi Xách Nữ Tote', 'Túi xách nữ tote canvas in họa tiết. Size lớn đựng laptop.', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400', 6, 'X-Store', 'Canvas', 250000, 359000),
-(46, 'Ví Nam Da', 'Ví nam da thật bifold. 6 ngăn thẻ, 2 ngăn tiền tiện lợi.', 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=400', 6, 'X-Store', 'Genuine Leather', 350000, 499000),
-(47, 'Kính Mát Unisex', 'Kính mát unisex chất acetate. Thiết kế wayfarer cổ điển.', 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400', 6, 'X-Store', 'Acetate', 280000, 399000),
-(48, 'Khăn Choàng Nữ Scarf', 'Khăn choàng nữ scarf lụa mềm mại. Họa tiết hoa văn tinh tế.', 'https://images.unsplash.com/photo-1601762603339-fd61e28b698a?w=400', 6, 'X-Store', 'Silk', 220000, 319000),
-(49, 'Vòng Tay Nữ Bracelet', 'Vòng tay nữ bracelet da thắt nút. Thiết kế minimalist.', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400', 6, 'X-Store', 'Leather', 150000, 219000),
-(50, 'Mũ Lưỡi Trai Unisex', 'Mũ lưỡi trai unisex cotton. Thiết kế baseball cap phong cách Mỹ.', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400', 6, 'X-Store', 'Cotton', 180000, 259000);
+(45, 'Túi Xách Nữ Tote', 'Túi xách nữ tote canvas in họa tiết. Size lớn đựng laptop.', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400', 3, 'X-Store', 'Canvas', 250000, 359000),
+(46, 'Ví Nam Da', 'Ví nam da thật bifold. 6 ngăn thẻ, 2 ngăn tiền tiện lợi.', 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=400', 3, 'X-Store', 'Genuine Leather', 350000, 499000),
+(47, 'Kính Mát Unisex', 'Kính mát unisex chất acetate. Thiết kế wayfarer cổ điển.', 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400', 3, 'X-Store', 'Acetate', 280000, 399000),
+(48, 'Khăn Choàng Nữ Scarf', 'Khăn choàng nữ scarf lụa mềm mại. Họa tiết hoa văn tinh tế.', 'https://images.unsplash.com/photo-1601762603339-fd61e28b698a?w=400', 3, 'X-Store', 'Silk', 220000, 319000),
+(49, 'Vòng Tay Nữ Bracelet', 'Vòng tay nữ bracelet da thắt nút. Thiết kế minimalist.', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400', 3, 'X-Store', 'Leather', 150000, 219000),
+(50, 'Mũ Lưỡi Trai Unisex', 'Mũ lưỡi trai unisex cotton. Thiết kế baseball cap phong cách Mỹ.', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400', 3, 'X-Store', 'Cotton', 180000, 259000);
 
 -- Insert sample comments
 INSERT IGNORE INTO comments (id, product_id, author_id, author, text, comment_at, rate) VALUES

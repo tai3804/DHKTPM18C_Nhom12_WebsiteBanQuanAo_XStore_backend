@@ -27,7 +27,7 @@ public class UploadController {
     );
 
     @PostMapping("/upload")
-    public ApiResponse<?> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ApiResponse<?> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam(value = "type", defaultValue = "comment") String type) {
         if (file.isEmpty()) {
             return new ApiResponse<>(ErrorCode.FILE_EMPTY);
         }
@@ -44,8 +44,16 @@ public class UploadController {
         }
 
         try  {
-            // Tạo thư mục comments nếu chưa có
-            File dir = new File(UPLOAD_DIR + "/comments");
+            // Xác định thư mục dựa trên type
+            String subDir = "comments";
+            if ("avatar".equals(type)) {
+                subDir = "avatars";
+            } else if ("product".equals(type)) {
+                subDir = "products";
+            }
+
+            // Tạo thư mục nếu chưa có
+            File dir = new File(UPLOAD_DIR + "/" + subDir);
             if (!dir.exists()) dir.mkdirs();
 
             // Tạo tên file duy nhất
@@ -54,13 +62,13 @@ public class UploadController {
             String uniqueFilename = UUID.randomUUID().toString() + extension;
 
             // Tạo đường dẫn file
-            Path filePath = Paths.get(UPLOAD_DIR + "/comments", uniqueFilename);
+            Path filePath = Paths.get(UPLOAD_DIR + "/" + subDir, uniqueFilename);
 
             // Lưu file
             Files.write(filePath, file.getBytes());
 
             // Trả về đường dẫn tương đối
-            String fileUrl = "/comments/" + uniqueFilename;
+            String fileUrl = "/" + subDir + "/" + uniqueFilename;
             return new ApiResponse<>(SuccessCode.FILE_UPLAOD_SUCCESSFULLY, fileUrl);
 
         } catch (Exception e) {

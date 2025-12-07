@@ -66,4 +66,12 @@ public class UserController {
         // Dùng lại SuccessCode RESET_PASSWORD_SUCCESSFULLY
         return new ApiResponse<>(SuccessCode.RESET_PASSWORD_SUCCESSFULLY, "Đổi mật khẩu thành công");
     }
+
+    // === ENDPOINT THỐNG KÊ KHÁCH HÀNG MỚI THEO KHOẢNG THỜI GIAN ===
+    @GetMapping("/statistics/new-customers")
+    public ApiResponse<Long> getNewCustomersCount(
+            @RequestParam(required = false, defaultValue = "month") String period) {
+        long count = userService.getNewCustomersCount(period);
+        return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, count);
+    }
 }

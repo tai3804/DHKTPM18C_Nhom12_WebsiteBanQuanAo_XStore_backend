@@ -27,6 +27,7 @@ public class SecurityConfig {
     private static final String[] PUBLIC = {
             "/uploads/**",
             "/comments/**",
+            "/avatars/**",
             "/",
             "/api/auth/**",
             "/api/otp/**",

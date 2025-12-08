@@ -21,8 +21,8 @@ public class AddressController {
      * GET /api/addresses/user/{userId}: Lấy tất cả địa chỉ của user
      */
     @GetMapping("/user/{userId}")
-    public ApiResponse<List<Address>> getUserAddresses(@PathVariable int userId) {
-        log.info("📍 Getting addresses for user: {}", userId);
+    public ApiResponse<List<Address>> getUserAddresses(@PathVariable("userId") int userId) {
+        log.info("Getting addresses for user: {}", userId);
         List<Address> addresses = addressService.findByUserId(userId);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(), "Fetch addresses successfully", addresses);
     }
@@ -39,7 +39,7 @@ public class AddressController {
      * GET /api/addresses/{id}: Lấy địa chỉ theo ID
      */
     @GetMapping("/{id}")
-    public ApiResponse<Address> getAddress(@PathVariable int id) {
+    public ApiResponse<Address> getAddress(@PathVariable("id") int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(), "Fetch address successfully", addressService.findById(id));
     }
 
@@ -49,7 +49,7 @@ public class AddressController {
     @PostMapping
     public ApiResponse<Address> createAddress(
             @RequestBody Address address,
-            @RequestParam int userId) {
+            @RequestParam("userId") int userId) {
         log.info("📍 Creating new address for user: {}", userId);
         Address createdAddress = addressService.createAddressForUser(address, userId);
         return new ApiResponse<>(SuccessCode.ADDRESS_CREATED.getCode(), "Address created successfully", createdAddress);
@@ -59,7 +59,7 @@ public class AddressController {
      * PUT /api/addresses/{id}: Cập nhật địa chỉ
      */
     @PutMapping("/{id}")
-    public ApiResponse<Address> updateAddress(@PathVariable int id, @RequestBody Address address) {
+    public ApiResponse<Address> updateAddress(@PathVariable("id") int id, @RequestBody Address address) {
         log.info("📍 Updating address: {}", id);
         address.setId(id);
         Address updatedAddress = addressService.updateAddress(address);
@@ -70,7 +70,7 @@ public class AddressController {
      * DELETE /api/addresses/{id}: Xóa địa chỉ
      */
     @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteAddress(@PathVariable int id) {
+    public ApiResponse<String> deleteAddress(@PathVariable("id") int id) {
         log.info("📍 Deleting address: {}", id);
         addressService.deleteAddress(id);
         return new ApiResponse<>(SuccessCode.ADDRESS_DELETED.getCode(), "Address deleted successfully", "Address " + id + " deleted");
@@ -80,7 +80,7 @@ public class AddressController {
      * PUT /api/addresses/{id}/set-default: Đặt địa chỉ làm mặc định
      */
     @PutMapping("/{id}/set-default")
-    public ApiResponse<Address> setDefaultAddress(@PathVariable int id, @RequestParam int userId) {
+    public ApiResponse<Address> setDefaultAddress(@PathVariable("id") int id, @RequestParam("userId") int userId) {
         log.info("📍 Setting default address: {} for user: {}", id, userId);
         Address address = addressService.setDefaultAddress(id, userId);
         return new ApiResponse<>(SuccessCode.ADDRESS_UPDATED.getCode(), "Default address set successfully", address);

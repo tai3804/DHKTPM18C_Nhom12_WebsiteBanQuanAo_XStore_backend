@@ -75,7 +75,7 @@ public class OtpController {
     }
 
     @GetMapping("/verify-otp")
-    public ApiResponse<String> verifyOtp(@RequestParam String contact, @RequestParam String otp) {
+    public ApiResponse<String> verifyOtp(@RequestParam("contact") String contact, @RequestParam("otp") String otp) {
         boolean valid = otpStorageService.validateOtp(contact, otp);
         return valid ? new ApiResponse<>(SuccessCode.OTP_VALID, null) : new ApiResponse<>(ErrorCode.OTP_INVALID_OR_EXPIRATION);
     }

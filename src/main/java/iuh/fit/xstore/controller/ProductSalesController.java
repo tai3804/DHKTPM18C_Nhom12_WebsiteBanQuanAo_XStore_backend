@@ -29,7 +29,7 @@ public class ProductSalesController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductSales>> getProductSalesByProductId(@PathVariable int productId) {
+    public ResponseEntity<ApiResponse<ProductSales>> getProductSalesByProductId(@PathVariable("productId") int productId) {
         Optional<ProductSales> productSales = productSalesService.getProductSalesByProductId(productId);
         if (productSales.isPresent()) {
             return ResponseEntity.ok(new ApiResponse<>(SuccessCode.FETCH_SUCCESS, productSales.get()));
@@ -56,7 +56,7 @@ public class ProductSalesController {
 
     @PutMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductSales>> updateProductSales(
-            @PathVariable int productId,
+            @PathVariable("productId") int productId,
             @RequestBody ProductSalesRequest request) {
 
         ProductSales updatedData = ProductSales.builder()
@@ -75,7 +75,7 @@ public class ProductSalesController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Void>> deleteProductSales(@PathVariable int productId) {
+    public ResponseEntity<ApiResponse<Void>> deleteProductSales(@PathVariable("productId") int productId) {
         productSalesService.deleteProductSales(productId);
         return ResponseEntity.ok(new ApiResponse<>(SuccessCode.PRODUCT_SALES_DELETED, null));
     }

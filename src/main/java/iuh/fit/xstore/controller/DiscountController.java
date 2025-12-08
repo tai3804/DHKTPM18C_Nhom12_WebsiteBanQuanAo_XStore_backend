@@ -25,7 +25,7 @@ public class DiscountController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Discount> getDiscount(@PathVariable int id) {
+    public ApiResponse<Discount> getDiscount(@PathVariable("id") int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, discountService.findById(id));
     }
 
@@ -36,14 +36,14 @@ public class DiscountController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<Discount> updateDiscount(@PathVariable int id, @RequestBody Discount discount) {
+    ApiResponse<Discount> updateDiscount(@PathVariable("id") int id, @RequestBody Discount discount) {
         discount.setId(id);
         Discount updatedDiscount = discountService.updateDiscount(discount);
         return new ApiResponse<>(SuccessCode.DISCOUNT_UPDATED, updatedDiscount);
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<Integer> deleteDiscount(@PathVariable int id) {
+    ApiResponse<Integer> deleteDiscount(@PathVariable("id") int id) {
         discountService.deleteDiscount(id);
         return new ApiResponse<>(SuccessCode.DISCOUNT_DELETED, id);
     }

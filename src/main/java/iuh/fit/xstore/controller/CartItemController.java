@@ -43,7 +43,7 @@ public class CartItemController {
 
     // ✅ Lấy cart items theo cart ID
     @GetMapping("/cart/{cartId}")
-    public ResponseEntity<?> getCartItemsByCartId(@PathVariable Integer cartId) {
+    public ResponseEntity<?> getCartItemsByCartId(@PathVariable("cartId") Integer cartId) {
         try {
             List<CartItem> cartItems = cartItemService.getCartItemsByCartId(cartId);
 
@@ -66,7 +66,7 @@ public class CartItemController {
 
     // ✅ Lấy cart item theo ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCartItemById(@PathVariable Integer id) {
+    public ResponseEntity<?> getCartItemById(@PathVariable("id") Integer id) {
         try {
             CartItem cartItem = cartItemService.getCartItemById(id);
 
@@ -117,7 +117,7 @@ public class CartItemController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateQuantity(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @RequestBody UpdateCartItemRequest request
     ) {
         try {
@@ -141,7 +141,7 @@ public class CartItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeFromCart(@PathVariable Integer id) {
+    public ResponseEntity<?> removeFromCart(@PathVariable("id") Integer id) {
         try {
             cartItemService.removeFromCart(id);
 

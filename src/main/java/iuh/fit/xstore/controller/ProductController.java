@@ -71,14 +71,14 @@ public class ProductController {
      */
     @PostMapping("/upload")
     public ApiResponse<Product> createProductWithImage(
-            @RequestParam String name,
-            @RequestParam String description,
-            @RequestParam String brand,
-            @RequestParam String fabric,
-            @RequestParam Double price,
-            @RequestParam Double priceInStock,
-            @RequestParam int typeId,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("brand") String brand,
+            @RequestParam("fabric") String fabric,
+            @RequestParam("price") Double price,
+            @RequestParam("priceInStock") Double priceInStock,
+            @RequestParam("typeId") int typeId,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) throws Exception {
         System.out.println("📥 [CREATE MULTIPART] Received product data:");
         System.out.println("   Name: " + name);
@@ -123,15 +123,15 @@ public class ProductController {
      */
     @PutMapping("/{id}/upload")
     public ApiResponse<Product> updateProductWithImage(
-            @PathVariable int id,
-            @RequestParam String name,
-            @RequestParam String description,
-            @RequestParam String brand,
-            @RequestParam String fabric,
-            @RequestParam Double price,
-            @RequestParam Double priceInStock,
-            @RequestParam int typeId,
-            @RequestParam(required = false) MultipartFile image
+            @PathVariable("id") int id,
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("brand") String brand,
+            @RequestParam("fabric") String fabric,
+            @RequestParam("price") Double price,
+            @RequestParam("priceInStock") Double priceInStock,
+            @RequestParam("typeId") int typeId,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) throws Exception {
         System.out.println("📥 [UPDATE MULTIPART] Updating product ID: " + id);
         System.out.println("   Name: " + name);
@@ -182,12 +182,12 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Product> getProductById(@PathVariable int id) {
+    public ApiResponse<Product> getProductById(@PathVariable("id") int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, productService.findById(id));
     }
 
     @GetMapping("/type/{typeId}")
-    public ApiResponse<List<Product>> getProductsByTypeId(@PathVariable int typeId) {
+    public ApiResponse<List<Product>> getProductsByTypeId(@PathVariable("typeId") int typeId) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, productService.findByTypeId(typeId));
     }
 
@@ -225,7 +225,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Product> updateProduct(@PathVariable int id, @RequestBody ProductUpdateRequest request) {
+    public ApiResponse<Product> updateProduct(@PathVariable("id") int id, @RequestBody ProductUpdateRequest request) {
 
         try {
             Product product = new Product();
@@ -262,7 +262,7 @@ public class ProductController {
 
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Integer> deleteProduct(@PathVariable int id) {
+    public ApiResponse<Integer> deleteProduct(@PathVariable("id") int id) {
         productService.deleteProduct(id);
         return new ApiResponse<>(SuccessCode.PRODUCT_DELETED, id);
     }
@@ -274,7 +274,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}/stocks")
-    public ApiResponse<List<Object>> getProductStocks(@PathVariable int id) {
+    public ApiResponse<List<Object>> getProductStocks(@PathVariable("id") int id) {
         List<Object> stockItems = productService.getProductStocks(id);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, stockItems);
     }

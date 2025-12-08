@@ -36,7 +36,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Order> getOrderById(@PathVariable int id) {
+    public ApiResponse<Order> getOrderById(@PathVariable("id") int id) {
         var order = orderService.findOrderById(id);
         if (order == null)
             return new ApiResponse<>(ErrorCode.ORDER_NOT_FOUND.getCode(),
@@ -53,7 +53,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
-    public ApiResponse<Order> updateOrderStatus(@PathVariable int id, @RequestBody String status) {
+    public ApiResponse<Order> updateOrderStatus(@PathVariable("id") int id, @RequestBody String status) {
         var updated = orderService.updateOrderStatus(id, status.replace("\"", "")); // Remove quotes from JSON string
         if (updated == null)
             return new ApiResponse<>(ErrorCode.ORDER_NOT_FOUND.getCode(),
@@ -63,7 +63,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Integer> deleteOrder(@PathVariable int id) {
+    public ApiResponse<Integer> deleteOrder(@PathVariable("id") int id) {
         var deletedId = orderService.deleteOrder(id);
         return new ApiResponse<>(SuccessCode.ORDER_DELETED.getCode(),
                 SuccessCode.ORDER_DELETED.getMessage(), deletedId);
@@ -78,7 +78,7 @@ public class OrderController {
     }
 
     @GetMapping("/items/{id}")
-    public ApiResponse<OrderItem> getOrderItemById(@PathVariable int id) {
+    public ApiResponse<OrderItem> getOrderItemById(@PathVariable("id") int id) {
         var item = orderService.findOrderItemById(id);
         if (item == null)
             return new ApiResponse<>(ErrorCode.ORDER_ITEM_NOT_FOUND.getCode(),
@@ -95,7 +95,7 @@ public class OrderController {
     }
 
     @PutMapping("/items/{id}")
-    public ApiResponse<OrderItem> updateOrderItem(@PathVariable int id, @RequestBody OrderItem item) {
+    public ApiResponse<OrderItem> updateOrderItem(@PathVariable("id") int id, @RequestBody OrderItem item) {
         var updated = orderService.updateOrderItem(id, item);
         if (updated == null)
             return new ApiResponse<>(ErrorCode.ORDER_ITEM_NOT_FOUND.getCode(),
@@ -105,7 +105,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/items/{id}")
-    public ApiResponse<Integer> deleteOrderItem(@PathVariable int id) {
+    public ApiResponse<Integer> deleteOrderItem(@PathVariable("id") int id) {
         var deletedId = orderService.deleteOrderItem(id);
         return new ApiResponse<>(SuccessCode.ORDER_ITEM_DELETED.getCode(),
                 SuccessCode.ORDER_ITEM_DELETED.getMessage(), deletedId);
@@ -128,7 +128,7 @@ public class OrderController {
 
     @PostMapping("/{orderId}/cancel")
     public ApiResponse<String> cancelOrder(
-            @PathVariable int orderId,
+            @PathVariable("orderId") int orderId,
             @RequestParam(defaultValue = "Khách hàng yêu cầu") String reason) {
         paymentService.cancelOrder(orderId, reason);
         return new ApiResponse<>(SuccessCode.ORDER_DELETED.getCode(),
@@ -136,7 +136,7 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    public ApiResponse<List<Order>> getUserOrders(@PathVariable int userId) {
+    public ApiResponse<List<Order>> getUserOrders(@PathVariable("userId") int userId) {
         List<Order> orders = paymentService.getUserOrders(userId);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
                 SuccessCode.FETCH_SUCCESS.getMessage(), orders);
@@ -145,7 +145,7 @@ public class OrderController {
     // ========== PDF EXPORT ==========
     @GetMapping("/{id}/pdf")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<byte[]> downloadOrderPdf(@PathVariable int id, Authentication authentication) {
+    public ResponseEntity<byte[]> downloadOrderPdf(@PathVariable("id") int id, Authentication authentication) {
         try {
             // Kiểm tra đơn hàng tồn tại
             var order = orderService.findOrderById(id);

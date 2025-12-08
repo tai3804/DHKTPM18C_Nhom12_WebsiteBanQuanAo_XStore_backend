@@ -42,7 +42,7 @@ public class CartController {
 
     // ✅ Lấy giỏ hàng theo ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCartById(@PathVariable Integer id) {
+    public ResponseEntity<?> getCartById(@PathVariable("id") Integer id) {
         try {
             Cart cart = cartService.getCartById(id);
 
@@ -88,7 +88,7 @@ public class CartController {
 
     // ✅ Lấy giỏ hàng của user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getCartByUserId(@PathVariable Integer userId) {
+    public ResponseEntity<?> getCartByUserId(@PathVariable("userId") Integer userId) {
         try {
             Cart cart = cartService.getCartByUserId(userId);
 
@@ -111,7 +111,7 @@ public class CartController {
 
     // ✅ Xóa giỏ hàng
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCart(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteCart(@PathVariable("id") Integer id) {
         try {
             cartService.deleteCart(id);
 

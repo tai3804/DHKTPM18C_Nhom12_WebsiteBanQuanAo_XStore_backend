@@ -24,7 +24,7 @@ public class ShipInfoController {
      * GET /api/ship-infos/user/{userId}: Lấy tất cả ship info của user
      */
     @GetMapping("/user/{userId}")
-    public ApiResponse<List<ShipInfoResponse>> getUserShipInfos(@PathVariable int userId) {
+    public ApiResponse<List<ShipInfoResponse>> getUserShipInfos(@PathVariable("userId") int userId) {
         log.info("📦 Getting ship infos for user: {}", userId);
         List<ShipInfo> shipInfos = shipInfoService.findByUserId(userId);
         List<ShipInfoResponse> responses = shipInfos.stream()
@@ -37,7 +37,7 @@ public class ShipInfoController {
      * GET /api/ship-infos/user/{userId}/default: Lấy ship info mặc định của user
      */
     @GetMapping("/user/{userId}/default")
-    public ApiResponse<ShipInfoResponse> getDefaultShipInfo(@PathVariable int userId) {
+    public ApiResponse<ShipInfoResponse> getDefaultShipInfo(@PathVariable("userId") int userId) {
         log.info("📦 Getting default ship info for user: {}", userId);
         ShipInfo shipInfo = shipInfoService.findDefaultByUserId(userId);
         ShipInfoResponse response = shipInfo != null ? convertToResponse(shipInfo) : null;
@@ -60,7 +60,7 @@ public class ShipInfoController {
      * GET /api/ship-infos/{id}: Lấy ship info theo ID
      */
     @GetMapping("/{id}")
-    public ApiResponse<ShipInfoResponse> getShipInfo(@PathVariable int id) {
+    public ApiResponse<ShipInfoResponse> getShipInfo(@PathVariable("id") int id) {
         ShipInfo shipInfo = shipInfoService.findById(id);
         ShipInfoResponse response = convertToResponse(shipInfo);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(), "Fetch ship info successfully", response);
@@ -72,7 +72,7 @@ public class ShipInfoController {
     @PostMapping
     public ApiResponse<ShipInfoResponse> createShipInfo(
             @RequestBody ShipInfoRequest request,
-            @RequestParam int userId) {
+            @RequestParam("userId") int userId) {
         log.info("📦 Creating new ship info for user: {}", userId);
         ShipInfo shipInfo = ShipInfo.builder()
                 .recipientName(request.getRecipientName())
@@ -93,7 +93,7 @@ public class ShipInfoController {
      * PUT /api/ship-infos/{id}: Cập nhật ship info
      */
     @PutMapping("/{id}")
-    public ApiResponse<ShipInfoResponse> updateShipInfo(@PathVariable int id, @RequestBody ShipInfoRequest request) {
+    public ApiResponse<ShipInfoResponse> updateShipInfo(@PathVariable("id") int id, @RequestBody ShipInfoRequest request) {
         log.info("📦 Updating ship info: {}", id);
         ShipInfo existedShipInfo = shipInfoService.findById(id);
         
@@ -118,7 +118,7 @@ public class ShipInfoController {
      * DELETE /api/ship-infos/{id}: Xóa ship info
      */
     @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteShipInfo(@PathVariable int id) {
+    public ApiResponse<String> deleteShipInfo(@PathVariable("id") int id) {
         log.info("📦 Deleting ship info: {}", id);
         shipInfoService.deleteShipInfo(id);
         return new ApiResponse<>(SuccessCode.SHIPINFO_DELETED.getCode(), "Ship info deleted successfully", "Ship info " + id + " deleted");
@@ -128,7 +128,7 @@ public class ShipInfoController {
      * PUT /api/ship-infos/{id}/set-default: Đặt ship info làm mặc định
      */
     @PutMapping("/{id}/set-default")
-    public ApiResponse<ShipInfoResponse> setDefaultShipInfo(@PathVariable int id, @RequestParam int userId) {
+    public ApiResponse<ShipInfoResponse> setDefaultShipInfo(@PathVariable("id") int id, @RequestParam("userId") int userId) {
         log.info("📦 Setting default ship info: {} for user: {}", id, userId);
         ShipInfo shipInfo = shipInfoService.setDefaultShipInfo(id, userId);
         ShipInfoResponse response = convertToResponse(shipInfo);

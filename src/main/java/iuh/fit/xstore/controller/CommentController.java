@@ -31,7 +31,7 @@ public class CommentController {
 
     // GET by ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCommentById(@PathVariable int id) {
+    public ResponseEntity<?> getCommentById(@PathVariable("id") int id) {
         Comment comment = commentService.findById(id);
         return ResponseEntity.ok(
                 new ApiResponse<>(200, "Lấy bình luận thành công", comment)
@@ -40,7 +40,7 @@ public class CommentController {
 
     // GET comments of product
     @GetMapping("/product/{productId}")
-    public ResponseEntity<?> getCommentsByProductId(@PathVariable int productId) {
+    public ResponseEntity<?> getCommentsByProductId(@PathVariable("productId") int productId) {
         List<Comment> comments = commentService.findByProductId(productId);
         return ResponseEntity.ok(
                 new ApiResponse<>(200, "Lấy bình luận sản phẩm thành công", comments)
@@ -49,7 +49,7 @@ public class CommentController {
 
     // GET comments by author
     @GetMapping("/author/{authorId}")
-    public ResponseEntity<?> getCommentsByAuthorId(@PathVariable int authorId) {
+    public ResponseEntity<?> getCommentsByAuthorId(@PathVariable("authorId") int authorId) {
         List<Comment> comments = commentService.findByAuthorId(authorId);
         return ResponseEntity.ok(
                 new ApiResponse<>(200, "Lấy bình luận của người dùng thành công", comments)
@@ -142,7 +142,7 @@ public class CommentController {
     // UPDATE comment
     @PutMapping("/{id}")
     public ResponseEntity<?> updateComment(
-            @PathVariable int id,
+            @PathVariable("id") int id,
             @RequestBody CommentUpdateRequest request) {
 
         Comment updated = commentService.update(
@@ -158,7 +158,7 @@ public class CommentController {
 
     // DELETE comment
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteComment(@PathVariable int id) {
+    public ResponseEntity<?> deleteComment(@PathVariable("id") int id) {
         commentService.delete(id);
         return ResponseEntity.ok(
                 new ApiResponse<>(200, "Xóa bình luận thành công", null)
@@ -167,7 +167,7 @@ public class CommentController {
 
     // STATS
     @GetMapping("/product/{productId}/stats")
-    public ResponseEntity<?> getCommentStats(@PathVariable int productId) {
+    public ResponseEntity<?> getCommentStats(@PathVariable("productId") int productId) {
 
         long count = commentService.countByProductId(productId);
         double avg = commentService.getAverageRatingByProductId(productId);

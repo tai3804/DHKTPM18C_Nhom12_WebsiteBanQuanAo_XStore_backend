@@ -23,19 +23,19 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<User> getUser(@PathVariable int id) {
+    public ApiResponse<User> getUser(@PathVariable("id") int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.findById(id));
     }
 
     // GET USER BY USERNAME
     @GetMapping("/username/{username}")
-    public ApiResponse<User> getUserByUsername(@PathVariable String username) {
+    public ApiResponse<User> getUserByUsername(@PathVariable("username") String username) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.findByUsername(username));
     }
 
     // SEARCH USERS
     @GetMapping("/search/query")
-    public ApiResponse<List<User>> searchUsers(@RequestParam String query) {
+    public ApiResponse<List<User>> searchUsers(@RequestParam("query") String query) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, userService.searchUsers(query));
     }
 
@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<User> updateUser(@PathVariable int id, @RequestBody User user) {
+    ApiResponse<User> updateUser(@PathVariable("id") int id, @RequestBody User user) {
         user.setId(id);
         User updatedUser = userService.updateUser(id, user);
         return new ApiResponse<>(SuccessCode.USER_UPDATED, updatedUser);
@@ -54,7 +54,7 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
-    ApiResponse<Integer> deleteUser(@PathVariable int id) {
+    ApiResponse<Integer> deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);
         return new ApiResponse<>(SuccessCode.USER_DELETED, id);
     }
@@ -70,7 +70,7 @@ public class UserController {
     // === ENDPOINT THỐNG KÊ KHÁCH HÀNG MỚI THEO KHOẢNG THỜI GIAN ===
     @GetMapping("/statistics/new-customers")
     public ApiResponse<Long> getNewCustomersCount(
-            @RequestParam(required = false, defaultValue = "month") String period) {
+            @RequestParam(value = "period", required = false, defaultValue = "month") String period) {
         long count = userService.getNewCustomersCount(period);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, count);
     }

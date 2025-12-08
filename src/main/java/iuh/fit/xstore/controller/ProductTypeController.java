@@ -21,7 +21,7 @@ public class ProductTypeController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<ProductType> getProductTypeById(@PathVariable int id) {
+    public ApiResponse<ProductType> getProductTypeById(@PathVariable("id") int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, productTypeService.findById(id));
     }
 
@@ -32,14 +32,14 @@ public class ProductTypeController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<ProductType> updateProductType(@PathVariable int id, @RequestBody ProductType productType) {
+    public ApiResponse<ProductType> updateProductType(@PathVariable("id") int id, @RequestBody ProductType productType) {
         productType.setId(id);
         ProductType updatedProductType = productTypeService.updateProductType(id, productType);
         return new ApiResponse<>(SuccessCode.PRODUCT_TYPE_UPDATED, updatedProductType);
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Integer> deleteProductType(@PathVariable int id) {
+    public ApiResponse<Integer> deleteProductType(@PathVariable("id") int id) {
         productTypeService.deleteProductType(id);
         return new ApiResponse<>(SuccessCode.PRODUCT_TYPE_DELETED, id);
     }

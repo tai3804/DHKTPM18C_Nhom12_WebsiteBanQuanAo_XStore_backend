@@ -29,13 +29,13 @@ public class FavouriteController {
     }
 
     @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<FavouriteID> delete(@PathVariable int userId, @PathVariable int productId) {
+    public ResponseEntity<FavouriteID> delete(@PathVariable("userId") int userId, @PathVariable("productId") int productId) {
         FavouriteID deleted = favouriteService.deleteFavourite(userId, productId);
         return ResponseEntity.ok(deleted);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Favourite>> findByUser(@PathVariable int userId) {
+    public ResponseEntity<List<Favourite>> findByUser(@PathVariable("userId") int userId) {
         return ResponseEntity.ok(favouriteService.findByUserId(userId));
     }
 }

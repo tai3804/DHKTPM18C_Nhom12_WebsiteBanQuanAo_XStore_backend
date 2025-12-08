@@ -65,7 +65,7 @@ public class ProductInfoController {
      * GET /api/products/{productId}/info - Lấy tất cả product info của sản phẩm
      */
     @GetMapping("/{productId}/info")
-    public ResponseEntity<?> getProductInfoByProductId(@PathVariable int productId) {
+    public ResponseEntity<?> getProductInfoByProductId(@PathVariable("productId") int productId) {
         try {
             List<ProductInfo> productInfoList = productInfoService.findByProductId(productId);
             
@@ -90,7 +90,7 @@ public class ProductInfoController {
      * GET /api/products/{productId}/colors - Lấy danh sách màu sắc của sản phẩm
      */
     @GetMapping("/{productId}/colors")
-    public ResponseEntity<?> getProductColors(@PathVariable int productId) {
+    public ResponseEntity<?> getProductColors(@PathVariable("productId") int productId) {
         try {
             List<Map<String, String>> colors = productInfoService.getDistinctColors(productId);
             
@@ -115,7 +115,7 @@ public class ProductInfoController {
      * GET /api/products/{productId}/sizes - Lấy danh sách kích thước của sản phẩm
      */
     @GetMapping("/{productId}/sizes")
-    public ResponseEntity<?> getProductSizes(@PathVariable int productId) {
+    public ResponseEntity<?> getProductSizes(@PathVariable("productId") int productId) {
         try {
             List<String> sizes = productInfoService.getDistinctSizes(productId);
             
@@ -140,7 +140,7 @@ public class ProductInfoController {
      * GET /api/products/info/{id} - Lấy product info theo ID
      */
     @GetMapping("/info/{id}")
-    public ResponseEntity<?> getProductInfoById(@PathVariable int id) {
+    public ResponseEntity<?> getProductInfoById(@PathVariable("id") int id) {
         try {
             ProductInfo productInfo = productInfoService.findById(id);
             
@@ -166,11 +166,11 @@ public class ProductInfoController {
      */
     @PostMapping("/{productId}/info/upload")
     public ResponseEntity<?> createProductInfoWithImage(
-            @PathVariable int productId,
-            @RequestParam String colorName,
-            @RequestParam String colorHexCode,
-            @RequestParam String sizeName,
-            @RequestParam(required = false) MultipartFile image
+            @PathVariable("productId") int productId,
+            @RequestParam("colorName") String colorName,
+            @RequestParam("colorHexCode") String colorHexCode,
+            @RequestParam("sizeName") String sizeName,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) {
         try {
             // 💾 Xử lý ảnh nếu có
@@ -211,11 +211,11 @@ public class ProductInfoController {
      */
     @PostMapping("/{productId}/info/batch/upload")
     public ResponseEntity<?> createMultipleProductInfoWithImages(
-            @PathVariable int productId,
-            @RequestParam List<String> colorNames,
-            @RequestParam List<String> colorHexCodes,
-            @RequestParam List<String> sizeNames,
-            @RequestParam(required = false) List<MultipartFile> images
+            @PathVariable("productId") int productId,
+            @RequestParam("colorNames") List<String> colorNames,
+            @RequestParam("colorHexCodes") List<String> colorHexCodes,
+            @RequestParam("sizeNames") List<String> sizeNames,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images
     ) {
         try {
             List<ProductInfo> productInfoList = new ArrayList<>();
@@ -259,11 +259,11 @@ public class ProductInfoController {
      */
     @PutMapping("/info/{id}/upload")
     public ResponseEntity<?> updateProductInfoWithImage(
-            @PathVariable int id,
-            @RequestParam String colorName,
-            @RequestParam String colorHexCode,
-            @RequestParam String sizeName,
-            @RequestParam(required = false) MultipartFile image
+            @PathVariable("id") int id,
+            @RequestParam("colorName") String colorName,
+            @RequestParam("colorHexCode") String colorHexCode,
+            @RequestParam("sizeName") String sizeName,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) {
         try {
             // 💾 Xử lý ảnh: nếu có file mới, lưu file mới; nếu không, giữ ảnh cũ
@@ -308,7 +308,7 @@ public class ProductInfoController {
      * DELETE /api/products/info/{id} - Xóa product info
      */
     @DeleteMapping("/info/{id}")
-    public ResponseEntity<?> deleteProductInfo(@PathVariable int id) {
+    public ResponseEntity<?> deleteProductInfo(@PathVariable("id") int id) {
         try {
             productInfoService.delete(id);
             
@@ -333,7 +333,7 @@ public class ProductInfoController {
      * DELETE /api/products/{productId}/info - Xóa tất cả product info của sản phẩm
      */
     @DeleteMapping("/{productId}/info")
-    public ResponseEntity<?> deleteAllProductInfo(@PathVariable int productId) {
+    public ResponseEntity<?> deleteAllProductInfo(@PathVariable("productId") int productId) {
         try {
             productInfoService.deleteByProductId(productId);
             

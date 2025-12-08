@@ -28,14 +28,14 @@ public class RequestController {
     }
 
     @GetMapping("/user/{userId}")
-    public ApiResponse<List<Request>> getUserRequests(@PathVariable int userId) {
+    public ApiResponse<List<Request>> getUserRequests(@PathVariable("userId") int userId) {
         var requests = requestService.findRequestsByUser(userId);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
                 SuccessCode.FETCH_SUCCESS.getMessage(), requests);
     }
 
     @GetMapping
-    public ApiResponse<List<Request>> getRequests(@RequestParam(required = false) Integer orderId) {
+    public ApiResponse<List<Request>> getRequests(@RequestParam(value = "orderId", required = false) Integer orderId) {
         List<Request> requests;
         if (orderId != null) {
             requests = requestService.findRequestsByOrder(orderId);
@@ -55,7 +55,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ApiResponse<Request> getRequestById(@PathVariable int id) {
+    public ApiResponse<Request> getRequestById(@PathVariable("id") int id) {
         var request = requestService.findRequestById(id);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
                 SuccessCode.FETCH_SUCCESS.getMessage(), request);
@@ -64,9 +64,9 @@ public class RequestController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")
     public ApiResponse<Request> updateRequestStatus(
-            @PathVariable int id,
-            @RequestParam RequestStatus status,
-            @RequestParam(defaultValue = "") String adminNote) {
+            @PathVariable("id") int id,
+            @RequestParam("status") RequestStatus status,
+            @RequestParam(value = "adminNote", defaultValue = "") String adminNote) {
         var updated = requestService.updateRequestStatus(id, status, adminNote);
         return new ApiResponse<>(SuccessCode.REQUEST_UPDATED.getCode(),
                 "Yêu cầu đã được cập nhật.", updated);
@@ -87,7 +87,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/search")
-    public ApiResponse<List<Request>> searchRequests(@RequestParam String keyword) {
+    public ApiResponse<List<Request>> searchRequests(@RequestParam("keyword") String keyword) {
         var requests = requestService.searchRequests(keyword);
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS.getCode(),
                 SuccessCode.FETCH_SUCCESS.getMessage(), requests);

@@ -28,7 +28,7 @@ public class AccountController {
 
     // Lấy tài khoản theo ID
     @GetMapping("/{id}")
-    public ApiResponse<Account> getAccount(@PathVariable int id) {
+    public ApiResponse<Account> getAccount(@PathVariable("id") int id) {
         return new ApiResponse<>(SuccessCode.FETCH_SUCCESS, accountService.findById(id));
     }
 
@@ -44,7 +44,7 @@ public class AccountController {
 
     // Cập nhật tài khoản
     @PutMapping("/{id}")
-    public ApiResponse<Account> updateAccount(@PathVariable int id, @RequestBody Account account) {
+    public ApiResponse<Account> updateAccount(@PathVariable("id") int id, @RequestBody Account account) {
         account.setId(id);
         Account updatedAccount = accountService.updateAccount(account);
         return new ApiResponse<>(SuccessCode.ACCOUNT_UPDATED, updatedAccount);
@@ -52,7 +52,7 @@ public class AccountController {
 
     // Xoá tài khoản theo ID
     @DeleteMapping("/{id}")
-    public ApiResponse<Integer> deleteAccount(@PathVariable int id) {
+    public ApiResponse<Integer> deleteAccount(@PathVariable("id") int id) {
         accountService.deleteAccount(id);
         return new ApiResponse<>(SuccessCode.ACCOUNT_DELETED, id);
     }

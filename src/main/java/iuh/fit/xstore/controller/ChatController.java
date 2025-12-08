@@ -41,7 +41,7 @@ public class ChatController {
 
     // API cho admin gửi tin nhắn
     @PostMapping("/admin/send/{chatRoomId}")
-    public ResponseEntity<Chat> sendAdminMessage(@PathVariable Long chatRoomId, @RequestBody Map<String, String> request) {
+    public ResponseEntity<Chat> sendAdminMessage(@PathVariable("chatRoomId") Long chatRoomId, @RequestBody Map<String, String> request) {
         String message = request.get("message");
         if (message == null) {
             return ResponseEntity.badRequest().build();
@@ -53,7 +53,7 @@ public class ChatController {
 
     // API lấy lịch sử chat của một chatRoom
     @GetMapping("/history/{chatRoomId}")
-    public ResponseEntity<List<Chat>> getChatHistory(@PathVariable Long chatRoomId) {
+    public ResponseEntity<List<Chat>> getChatHistory(@PathVariable("chatRoomId") Long chatRoomId) {
         List<Chat> history = chatService.getChatHistory(chatRoomId);
         return ResponseEntity.ok(history);
     }
@@ -89,7 +89,7 @@ public class ChatController {
 
     // API đánh dấu đã đọc
     @PutMapping("/admin/mark-read/{chatId}")
-    public ResponseEntity<Void> markAsRead(@PathVariable Long chatId) {
+    public ResponseEntity<Void> markAsRead(@PathVariable("chatId") Long chatId) {
         chatService.markAsRead(chatId);
         return ResponseEntity.ok().build();
     }
@@ -103,7 +103,7 @@ public class ChatController {
 
     // API lấy tin nhắn chưa đọc của một chatRoom
     @GetMapping("/admin/unread/{chatRoomId}")
-    public ResponseEntity<List<Chat>> getUnreadMessages(@PathVariable Long chatRoomId) {
+    public ResponseEntity<List<Chat>> getUnreadMessages(@PathVariable("chatRoomId") Long chatRoomId) {
         List<Chat> unreadMessages = chatService.getUnreadMessages(chatRoomId);
         return ResponseEntity.ok(unreadMessages);
     }
@@ -117,14 +117,14 @@ public class ChatController {
 
     // API đánh dấu tất cả messages của một chatRoom là đã đọc
     @PutMapping("/admin/mark-read/chat-room/{chatRoomId}")
-    public ResponseEntity<Void> markChatRoomMessagesAsRead(@PathVariable Long chatRoomId) {
+    public ResponseEntity<Void> markChatRoomMessagesAsRead(@PathVariable("chatRoomId") Long chatRoomId) {
         chatService.markChatRoomMessagesAsRead(chatRoomId);
         return ResponseEntity.ok().build();
     }
 
     // API lấy số messages chưa đọc của một chatRoom
     @GetMapping("/admin/chat-room/{chatRoomId}/unread-count")
-    public ResponseEntity<Long> getChatRoomUnreadCount(@PathVariable Long chatRoomId) {
+    public ResponseEntity<Long> getChatRoomUnreadCount(@PathVariable("chatRoomId") Long chatRoomId) {
         long count = chatService.getChatRoomUnreadCount(chatRoomId);
         return ResponseEntity.ok(count);
     }
